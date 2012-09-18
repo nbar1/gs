@@ -346,7 +346,7 @@ class gsControl
 			$output .= "</ul>";
 			return $output;
 		} else {
-			return $this->displayNicknameView();
+			return $this->initializeView();
 		}
 	}
 }
