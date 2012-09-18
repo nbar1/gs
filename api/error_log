@@ -1,0 +1,11 @@
+[10-Sep-2012 16:18:55] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:19:13] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:21:18] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:21:18] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:23:04] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:23:25] PHP Fatal error:  getStreamKeyStreamServer requires a valid songID. in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 950
+[10-Sep-2012 16:44:09] PHP Parse error:  syntax error, unexpected T_ELSE, expecting T_FUNCTION in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 380
+[10-Sep-2012 16:44:10] PHP Parse error:  syntax error, unexpected T_ELSE, expecting T_FUNCTION in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 380
+[10-Sep-2012 16:44:21] PHP Parse error:  syntax error, unexpected T_ELSE, expecting T_FUNCTION in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 380
+[10-Sep-2012 16:44:24] PHP Parse error:  syntax error, unexpected T_ELSE, expecting T_FUNCTION in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 380
+[10-Sep-2012 17:00:07] PHP Catchable fatal error:  Argument 1 passed to gsAPI::authenticate() must be an instance of gsUser, string given, called in /home1/thegogre/public_html/nbar1/projects/gs/api/songGetter.php on line 31 and defined in /home1/thegogre/public_html/nbar1/projects/gs/api/gsAPI.php on line 160

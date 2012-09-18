@@ -1,0 +1,179 @@
+body {
+	background: #000;
+	color: #fff;
+	font-family: "verdana";
+	font-size: 10px;
+	margin: 0px;
+	padding: 0px;
+}
+#content {
+	margin-top: 29.3em;
+	position: relative;
+}
+#song_list {
+	list-style: none;
+	margin-bottom: 20em;
+	padding: 0;
+	text-align: left;
+	width: 100%;
+}
+#error_message_generic {
+	font-size: 10em;
+	margin-top: 4em;
+	text-align: center;
+	width: 100%;
+}
+
+/* Footer */
+.footer_sticky {
+	background: #333;
+	border-top: 0.01em solid #fff;
+	bottom: 0px;
+	font-size: 10em;
+	height: 2em;
+	line-height: 2em;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+}
+.footer_button {
+	background: #444;
+	float: left;
+	font-size: 1em;
+	height: 1.5em;
+	line-height: 1.5em;
+	margin: 0.3em 0.3em 0.3em 0.35em;
+	width: 45%;
+}
+
+/* Search */
+#search {
+	background: #333;
+	border-bottom: 0.2em solid #fff;
+	left: 0;
+	padding: 3%;
+	position: fixed;
+	text-align: center;
+	top: 0;
+	width: 94%;
+	z-index: 2;
+}
+#search .searchbox {
+	background: #444;
+	border: none;
+	color: #ddd;
+	float: left;
+	font-size: 13em;
+	outline: none;
+	padding: 0.2em 0.2em 0.2em 0.5em;
+	width: 81%;
+}
+#search .search_submit {
+	background: #444;
+	border-left: 0.02em solid #222;
+	color: #666;
+	float: left;
+	font-size: 10.4em;
+	height: 1.97em;
+	line-height: 2em;
+	margin: 2px 0 0;
+	width: 18%;
+}
+#search_results {
+	font-size: 1em;
+	text-align: center;
+}
+#addToQueue_options,
+#addToQueue_response {
+	display: none;
+}
+.item_song.selected {
+	background: #595959; /* Old browsers */
+	background: -moz-linear-gradient(top, #595959 12%, #5b5b5b 25%, #2c2c2c 59%, #111111 73%, #1c1c1c 81%, #2b2b2b 99%, #474747 100%, #000000 100%, #131313 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(12%,#595959), color-stop(25%,#5b5b5b), color-stop(59%,#2c2c2c), color-stop(73%,#111111), color-stop(81%,#1c1c1c), color-stop(99%,#2b2b2b), color-stop(100%,#474747), color-stop(100%,#000000), color-stop(100%,#131313)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #595959 12%,#5b5b5b 25%,#2c2c2c 59%,#111111 73%,#1c1c1c 81%,#2b2b2b 99%,#474747 100%,#000000 100%,#131313 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #595959 12%,#5b5b5b 25%,#2c2c2c 59%,#111111 73%,#1c1c1c 81%,#2b2b2b 99%,#474747 100%,#000000 100%,#131313 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #595959 12%,#5b5b5b 25%,#2c2c2c 59%,#111111 73%,#1c1c1c 81%,#2b2b2b 99%,#474747 100%,#000000 100%,#131313 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #595959 12%,#5b5b5b 25%,#2c2c2c 59%,#111111 73%,#1c1c1c 81%,#2b2b2b 99%,#474747 100%,#000000 100%,#131313 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#595959', endColorstr='#131313',GradientType=0 ); /* IE6-9 */
+}
+
+
+/* Queue */
+#song_list .item_song {
+	border-bottom: 1px solid #fff;
+	padding: 5em 3%;
+	position: relative;
+	width: 94%;
+}
+.item_song .song_name {
+	font-size: 8em;
+}
+.item_song .song_artist {
+	color: #666;
+	font-size: 2em;
+	margin-left: 5px;
+}
+.item_song .song_played_by {
+	color: #666;
+	font-size: 1.3em;
+	margin-left: 5px;
+}
+.item_song .song_id {
+	display: none;
+}
+.item_song .item_status {
+	float: right;
+	border-radius: 20px;
+	display: none;
+	height: 40px;
+	margin-top: 15px;
+	width: 40px;
+}
+.item_song.high .item_status {
+	background: #ff0000;
+}
+.item_song.med .item_status {
+	background: #0000ff;
+}
+.item_song.playing .item_status {
+	background: #00ff00;
+}
+.item_song.playing .now_playing_marker,
+.item_song.high .high_priority_marker {
+	bottom: 1%;
+	font-size: 5em;
+	position: absolute;
+	right: 1%;
+}
+.item_song.high .high_priority_marker {
+	color: #009900;
+}
+
+/* Username Management */
+.setUser_header {
+	font-size: 12em;
+	margin-top: 5em;
+	text-align: center;
+}
+.setUser_textbox {
+	background: #444;
+	border: none;
+	color: #ddd;
+	font-size: 13em;
+	margin: 10%;
+	outline: none;
+	padding: 0.2em 0.2em 0.2em 0.5em;
+	width: 80%;
+}
+#setUser_submit {
+	background: #444;
+	border-left: 0.02em solid #222;
+	color: #666;
+	font-size: 10.4em;
+	height: 1.97em;
+	line-height: 2em;
+	margin: 0 auto;
+	text-align: center;
+	width: 40%;
+}
