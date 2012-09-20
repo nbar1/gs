@@ -2,8 +2,11 @@
 session_start();
 require('db.php');
 require('gsControl.class.php');
+require('api/gsAPI.php');
 
 $gs = new gsControl();
+$gsapi = new gsAPI('nbar1', '1f64634987618265edb26fe236c00011');
+gsAPI::$headers = array("X-Client-IP: " . $_SERVER['REMOTE_ADDR']);
 
 switch($_REQUEST['f'])
 {
@@ -27,6 +30,15 @@ switch($_REQUEST['f'])
 		echo $gs->addSongToQueue($_REQUEST['songID'], $_REQUEST['songPriority'], $_REQUEST['songArtist'], $_REQUEST['songTitle']);
 		break;
 
+	case 'markSong30Seconds':
+		echo $gsapi->markStreamKeyOver30Secs($_REQUEST['streamKey'], $_REQUEST['streamServerID']);
+		break;
+	case 'getSongInfo':
+		echo $gsapi->getSongInfo($_REQUEST['song']);
+		break;
+	case 'getNextSong':
+		echo $gs->getNextSong();
+		break;
 	default:
 		echo $gs->initializeView();
 		break;

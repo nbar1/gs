@@ -1,4 +1,4 @@
 db.php
 *.swp
 *.ico
-songGetter.php
+api/**/*

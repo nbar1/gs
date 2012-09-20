@@ -26,6 +26,7 @@ session_start();
 </div>
 <div id="content">
 	<div id="content_loader"><div id="error_message_generic">loading</div></div>
+	<div id="modal"></div>
 </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/javascripts/global.js"></script>

@@ -145,7 +145,7 @@ class gsAPI{
 			return false;
 		}
 
-		$return = self::apiCall('authenticate',array('login'=>($user->getUsername() ? $user->getUsername() :  $user->getEmail()), 
+		$return = self::apiCall('authenticate',array('login'=>($user->getUsername() ? $user->getUsername() :  $user->getEmail()),
 									'password'=>$user->getToken(), 'sessionID'=>$this->session), true);
 		if (isset($return['decoded']['result']['UserID']) && $return['decoded']['result']['UserID'] > 0) {
 			$user->importUserData($return['decoded']['result']);
@@ -446,13 +446,13 @@ class gsAPI{
 			return false;
 		}
 
-		$return = self::apiCall('getSongsInfo',array('songIDs'=>$song));
+		$return = self::apiCall('getSongsInfo',array('songIDs'=>$song, 'sessionID'=>$_SESSION['gsSession']));
 		if (isset($return['decoded']['result']['songs'][0]))
 		{
-			return $return['decoded']['result']['songs'][0];
+			return json_encode($return['decoded']['result']['songs'][0]);
 		} else {
 			gsAPI::$lastError = $return['raw'];
-			return false;
+			return json_encode($return);
 		}
 	}
 
@@ -905,7 +905,7 @@ class gsAPI{
 			foreach($return['decoded']['result']['albums'] AS &$albm){
 				$albm['Songs'] = self::getAlbumSongs($albm['AlbumID']);
 				$albm['SongCount'] = count($albm['Songs']);
-			} 
+			}
 			return $return['decoded']['result']['albums'];
 		} else {
 			gsAPI::$lastError = $return['raw'];
@@ -928,8 +928,6 @@ class gsAPI{
 		if (!$username || !$password) {
 			return false;
 		}
-		return $username . ":" . $password;
-		exit;
 		$return = self::apiCall('authenticate',array('login'=>$username, 'password'=>$password, 'sessionID'=>$this->session), true);
 		if (isset($return['decoded']['result']['UserID']) && $return['decoded']['result']['UserID'] > 0) {
 			return $return['decoded']['result'];
@@ -959,14 +957,14 @@ class gsAPI{
 		if (!$this->session) {
 			trigger_error(__FUNCTION__." requires a valid session. No session was found.", E_USER_ERROR);
 		}
-		$return = self::apiCall('getStreamKeyStreamServer',array('songID'=>$songID, 'country'=>$this->country, 'sessionID'=>$this->session, 'lowBitrate'=>$lowBitrate));
+		$return = self::apiCall('getSubscriberStreamKey',array('songID'=>$songID, 'country'=>$this->country, 'sessionID'=>$this->session, 'lowBitrate'=>$lowBitrate));
 		if (isset($return['decoded']['result']['StreamKey'])) {
 			$serverURL = parse_url($return['decoded']['result']['url']);
 			$return['decoded']['result']['StreamServerHostname'] = $serverURL['host'];
 			return $return['decoded']['result'];
 		} else {
 			gsAPI::$lastError = $return['raw'];
-			return $return;
+			return false;
 		}
 	}
 
@@ -981,12 +979,14 @@ class gsAPI{
 		if (!$streamServerID) {
 			trigger_error(__FUNCTION__." requires a valid streamServerID.", E_USER_ERROR);
 		}
+		/*
 		if (!$this->session) {
 			trigger_error(__FUNCTION__." requires a valid session. No session was found.", E_USER_ERROR);
 		}
-		$return = self::apiCall('markStreamKeyOver30Secs', array('streamKey'=>$streamKey, 'streamServerID'=>$streamServerID, 'sessionID'=>$this->session));
+		*/
+		$return = self::apiCall('markStreamKeyOver30Secs', array('streamKey'=>$streamKey, 'streamServerID'=>$streamServerID, 'sessionID'=>$_SESSION['gsSession']));
 		if (isset($return['decoded']['result']['success']) && $return['decoded']['result']['success']) {
-			return $return['decoded']['result'];
+			return json_encode($return['decoded']['result']);
 		} else {
 			gsAPI::$lastError = $return['raw'];
 			return false;

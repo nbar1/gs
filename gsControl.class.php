@@ -4,7 +4,7 @@
  */
 class gsControl
 {
-	var $api_key = "a2e5ffd9cc99a2bee6207e4921def6a7";
+	var $api_key = "a2e5ffd9cc99a2bee6207e4921def6a7"; // This is the TinySong API key for searching
 	/**
 	 * initializeView
 	 *
@@ -240,6 +240,41 @@ class gsControl
 	}
 
 	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	function getNextSong()
+	{
+		$sql = "SELECT q_id, q_song_id, q_song_status FROM thegogre_grooveshark.queue WHERE q_song_status='queued' OR q_song_status='playing' ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC LIMIT 2";
+		$result = mysql_query($sql);
+		$x=0;
+		while($row = mysql_fetch_assoc($result))
+		{
+			if($x==0)
+			{
+				if($row['q_song_status'] == "playing")
+				{
+					$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='played' WHERE q_id='".$row['q_id']."'";
+					$result2 = mysql_query($sql2);
+					$x++;
+				} else {
+					$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='playing' WHERE q_id='".$row['q_id']."'";
+					$result2 = mysql_query($sql2);
+					return $row['q_song_id'];
+				}
+			} else {
+				$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='playing' WHERE q_id='".$row['q_id']."'";
+				$result2 = mysql_query($sql2);
+				return $row['q_song_id'];
+			}
+		}
+	}
+
+	/**
 	 * doSearch
 	 *
 	 * Returns an array of search results based on a given query
@@ -323,7 +358,8 @@ class gsControl
 	{
 		if($this->isAuthenticated() == TRUE)
 		{
-			$output = "<ul id='song_list' class='queue'>";
+			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
+			$output .= "<ul id='song_list' class='queue'>";
 
 			$sql = "SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM thegogre_grooveshark.queue WHERE q_song_status='queued' OR q_song_status='playing' ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC";
 			$result = mysql_query($sql);
