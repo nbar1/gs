@@ -15,12 +15,15 @@ class gsControl
 	 */
 	function initializeView()
 	{
+		global $db;
 		if($this->isAuthenticated() == TRUE)
 		{
-			$sql = "UPDATE thegogre_grooveshark.users SET user_lastlogin='".date("Y-m-d H:i:s")."' WHERE user_id='".mysql_real_escape_string($this->getUserID())."'";
-			$result = mysql_query($sql);
+			$data = array(date("Y-m-d H:i:s"), $this->getUserID());
+			$dbh = $db->prepare("UPDATE users SET user_lastlogin=? WHERE user_id=?");
+			$dbh->execute($data);
 			return $this->displayQueueView();
-		} else {
+		}
+		else {
 			return $this->displayNicknameView();
 		}
 	}
@@ -34,17 +37,20 @@ class gsControl
 	 */
 	function isAuthenticated()
 	{
+		global $db;
 		if(isset($_COOKIE['user']))
 		{
-			$sql = "SELECT COUNT(*) from thegogre_grooveshark.users WHERE user_id='".mysql_real_escape_string($_COOKIE['user'])."'";
-			$result = mysql_query($sql);
-			if(mysql_num_rows($result) > 0)
+			$data = array($this->getUserID());
+			$dbh = $db->prepare("SELECT user_id FROM users WHERE user_id=?");
+			$dbh->execute($data);
+			if($dbh->rowCount() > 0)
 			{
 				return true;
 			} else {
 				return false;
 			}
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -58,10 +64,11 @@ class gsControl
 	 */
 	function getUserID()
 	{
-		if($this->isAuthenticated() == TRUE)
+		if($_COOKIE['user'])
 		{
 			return $_COOKIE['user'];
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -75,32 +82,38 @@ class gsControl
 	 */
 	function setNickname($nickname)
 	{
+		global $db;
 		if($this->isAuthenticated() == FALSE)
 		{
 			if(strlen($nickname) > 32)
 			{
 				$nickname = substr($nickname, 0, 32);
 			}
-			$sql = "SELECT user_id FROM thegogre_grooveshark.users WHERE user_nickname='".mysql_real_escape_string($nickname)."'";
-			$result = mysql_query($sql);
-			if(mysql_num_rows($result) < 1)
+			
+			$data = array($nickname);
+			$dbh = $db->prepare("SELECT user_id FROM users WHERE user_nickname=?");
+			$dbh->execute($data);
+			if($dbh->rowCount() < 1)
 			{
 				// Continue with creating user
-				$sql = "INSERT INTO thegogre_grooveshark.users (user_nickname, user_created, user_lastlogin) VALUES ('".mysql_real_escape_string($nickname)."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
-				$result = mysql_query($sql);
-				if($result)
+				$data = array($nickname, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'));
+				$dbh = $db->prepare("INSERT INTO users (user_nickname, user_created, user_lastlogin) VALUES (?, ?, ?)");
+				if($dbh->execute($data))
 				{
-					setcookie('user', mysql_insert_id(), strtotime("+5 years"));
+					setcookie('user', $dbh->lastInsertId(), strtotime("+5 years"));
 					return true;
 				} else {
 					return false;
 				}
-			} else {
-				$row = mysql_fetch_assoc($result);
+			}
+			else {
+				$dbh->setFetchMode(PDO::FETCH_ASSOC);
+				$row = $dbh->fetch();
 				setcookie('user', $row['user_id'], strtotime("+5 years"));
 				return true;
 			}
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -113,19 +126,23 @@ class gsControl
 	 * @param $userID
 	 * @return string
 	 */
-	function getNickname($userID=FALSE)
+	function getNickname($userID = FALSE)
 	{
+		global $db;
 		if($userID == FALSE)
 		{
 			$userID = $this->getUserID();
 		}
 		if($userID <> FALSE)
 		{
-			$sql = "SELECT user_nickname FROM thegogre_grooveshark.users WHERE user_id='".mysql_real_escape_string($userID)."'";
-			$result = mysql_query($sql);
-			$row = mysql_fetch_assoc($result);
+			$data = array($userID);
+			$dbh = $db->prepare("SELECT user_nickname FROM users WHERE user_id=?");
+			$dbh->execute($data);
+			$dbh->setFetchMode(PDO::FETCH_ASSOC);
+			$row = $dbh->fetch();	
 			return $row['user_nickname'];
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -140,6 +157,7 @@ class gsControl
 	 */
 	function getAvailablePromotions($userID=FALSE)
 	{
+		global $db;
 		$maxPromotions = 3;
 		if($userID == FALSE)
 		{
@@ -147,16 +165,18 @@ class gsControl
 		}
 		if($userID <> FALSE)
 		{
-			$sql = "SELECT COUNT(*) FROM thegogre_grooveshark.queue WHERE q_song_priority='high' OR q_song_priority='med' AND q_song_played_by='".$userID."' AND q_song_added_ts >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)";
-			$result = mysql_query($sql);
-			if($result)
+			$data = array("high", "med", $userID);
+			$dbh = $db->prepare("SELECT * FROM queue WHERE q_song_priority=? OR q_song_priority=? AND q_song_played_by=? AND q_song_added_ts >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
+			if($dbh->execute($data))
 			{
-				$availablePromotions = $maxPromotions - mysql_num_rows($result);
+				$availablePromotions = $maxPromotions - $dbh->rowCount();
 				return $availablePromotions;
-			} else {
+			}
+			else {
 				return 0;
 			}
-		} else {
+		}
+		else {
 			return 0;
 		}
 	}
@@ -170,14 +190,16 @@ class gsControl
 	 */
 	function getNextQueuePosition()
 	{
-		$sql = "SELECT MAX(q_song_position) FROM thegogre_grooveshark.queue";
-		$result = mysql_query($sql);
-		$row = mysql_fetch_assoc($result);
-		$songPosition = $row['MAX(q_song_position)'];
+		global $db;
+		$dbh = $db->prepare("SELECT MAX(q_song_position) FROM queue");
+		$dbh->execute();
+		$songPosition = $dbh->fetchColumn();
+
 		if(!$songPosition)
 		{
 			$songPosition = 1;
-		} else {
+		}
+		else {
 			$songPosition++;
 		}
 		return $songPosition;
@@ -193,12 +215,15 @@ class gsControl
 	 */
 	function isSongInQueue($songID)
 	{
-		$sql = "SELECT q_id FROM thegogre_grooveshark.queue WHERE q_song_status='queued' AND q_song_id='".$songID."' LIMIT 1";
-		$result = mysql_query($sql) or die(mysql_error());
-		if(mysql_num_rows($result) > 0)
+		global $db;
+		$data = array("queued", $songID);
+		$dbh = $db->prepare("SELECT q_id FROM queue WHERE q_song_status=? AND q_song_id=? LIMIT 1");
+		$dbh->execute($data);
+		if($dbh->rowCount() > 0)
 		{
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -216,25 +241,30 @@ class gsControl
 	 */
 	function addSongToQueue($songID, $songPriority, $songArtist, $songTitle)
 	{
+		global $db;
 		if($this->isSongInQueue($songID) == FALSE)
 		{
 			if($this->getAvailablePromotions() < 1)
 			{
 				$songPriority = "low";
 			}
-			$sql = "INSERT INTO thegogre_grooveshark.queue (q_song_id, q_song_title, q_song_artist, q_song_priority, q_song_position, q_song_added_ts, q_song_played_by) VALUES ('".$songID."','".$songTitle."','".$songArtist."','".$songPriority."','".$this->getNextQueuePosition()."','".date("Y-m-d H:i:s")."','".$this->getUserID()."')";
-			if(mysql_query($sql))
+			$data = array($songID, $songTitle, $songArtist, $songPriority, $this->getNextQueuePosition(), date("Y-m-d H:i:s"), $this->getUserID());
+			$dbh = $db->prepare("INSERT INTO queue (q_song_id, q_song_title, q_song_artist, q_song_priority, q_song_position, q_song_added_ts, q_song_played_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			if($dbh->execute($data))
 			{
 				if($songPriority == "high")
 				{
 					return "song promoted";
-				} else {
+				}
+				else {
 					return "song added";
 				}
-			} else {
+			}
+			else {
 				return "error adding song";
 			}
-		} else {
+		}
+		else {
 			return "song already queued";
 		}
 	}
@@ -249,26 +279,35 @@ class gsControl
 	 */
 	function getNextSong()
 	{
-		$sql = "SELECT q_id, q_song_id, q_song_status FROM thegogre_grooveshark.queue WHERE q_song_status='queued' OR q_song_status='playing' ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC LIMIT 2";
-		$result = mysql_query($sql);
+		global $db;
+		$data = array("queued", "playing");
+		$dbh = $db->prepare("SELECT q_id, q_song_id, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC LIMIT 2");
+		$dbh->execute($data);
+		$dbh->setFetchMode(PDO::FETCH_ASSOC);
+		$rows = $dbh->fetchAll();	
 		$x=0;
-		while($row = mysql_fetch_assoc($result))
+		foreach($rows as $row)
 		{
 			if($x==0)
 			{
 				if($row['q_song_status'] == "playing")
 				{
-					$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='played' WHERE q_id='".$row['q_id']."'";
-					$result2 = mysql_query($sql2);
+					$data = array("played", $row['q_id']);
+					$dbh = $db->prepare("UPDATE queue SET q_song_status=? WHERE q_id=?");
+					$dbh->execute($data);
 					$x++;
-				} else {
-					$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='playing' WHERE q_id='".$row['q_id']."'";
-					$result2 = mysql_query($sql2);
+				}
+				else {
+					$data = array("playing", $row['q_id']);
+					$dbh = $db->prepare("UPDATE queue SET q_song_status=? WHERE q_id=?");
+					$dbh->execute($data);
 					return $row['q_song_id'];
 				}
-			} else {
-				$sql2 = "UPDATE thegogre_grooveshark.queue SET q_song_status='playing' WHERE q_id='".$row['q_id']."'";
-				$result2 = mysql_query($sql2);
+			}
+			else {
+				$data = array("playing", $row['q_id']);
+				$dbh = $db->prepare("UPDATE queue SET q_song_status=? WHERE q_id=?");
+				$dbh->execute($data);
 				return $row['q_song_id'];
 			}
 		}
@@ -306,7 +345,8 @@ class gsControl
 		if(sizeof($results) < 1)
 		{
 			$output = "<div id='error_message_generic'>No Results Found</div>";
-		} else {
+		}
+		else {
 			$output = "<ul id='song_list'>";
 			foreach($results as $k=>$song)
 			{
@@ -341,7 +381,8 @@ class gsControl
 			$output .= "<input type='text' class='setUser_textbox' id='setUser_textbox' placeholder='name' maxlength='32' />";
 			$output .= "<div id='setUser_submit' onclick=''>submit</div>";
 			return $output;
-		} else {
+		}
+		else {
 			return $this->displayQueueView();
 		}
 	}
@@ -356,15 +397,19 @@ class gsControl
 	 */
 	function displayQueueView()
 	{
+		global $db;
 		if($this->isAuthenticated() == TRUE)
 		{
 			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
 			$output .= "<ul id='song_list' class='queue'>";
 
-			$sql = "SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM thegogre_grooveshark.queue WHERE q_song_status='queued' OR q_song_status='playing' ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC";
-			$result = mysql_query($sql);
+			$data = array("queued", "playing");
+			$dbh = $db->prepare("SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC");
+			$dbh->execute($data);
+			$dbh->setFetchMode(PDO::FETCH_ASSOC);
+			$rows = $dbh->fetchAll();
 
-			while($row = mysql_fetch_assoc($result))
+			foreach($rows as $row)
 			{
 				$output .= "<li class='item_song ".$row['q_song_priority']." ".$row['q_song_status']."' onclick=''>";
 				$output .= "<div class='item_status'></div>";
@@ -381,7 +426,8 @@ class gsControl
 			}
 			$output .= "</ul>";
 			return $output;
-		} else {
+		}
+		else {
 			return $this->initializeView();
 		}
 	}

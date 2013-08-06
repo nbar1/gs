@@ -1,6 +1,6 @@
 <html>
 <head>
-	<script src="/assets/swfobject/swfobject.js"></script>
+	<script src="../assets/swfobject/swfobject.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <style>
 body {
@@ -61,7 +61,7 @@ swfobject.embedSWF("http://grooveshark.com/APIPlayer.swf", "player", "300", "300
 function playSong(songID)
 {
 	$.ajax({
-		url: "/api/songGetter.php",
+		url: "../api/songGetter.php",
 		type: "POST",
 		data: {
 			song: songID
@@ -89,7 +89,7 @@ function playSong(songID)
 function nextSong()
 {
 	$.ajax({
-		url: "/f.php?f=getNextSong",
+		url: "../f.php?f=getNextSong",
 		type: "POST",
 		data: {},
 		success: function(response){
@@ -102,7 +102,7 @@ function getSongInfo(songID)
 {
 	console.log('fire get song info');
 	$.ajax({
-		url: "/f.php?f=getSongInfo",
+		url: "../f.php?f=getSongInfo",
 		type: "POST",
 		data: {
 			song: songID
@@ -120,7 +120,7 @@ function markSong30Seconds(streamKey, streamServerID)
 {
 	console.log('fire mark song 30 seconds');
 	$.ajax({
-		url: "/f.php?f=markSong30Seconds",
+		url: "../f.php?f=markSong30Seconds",
 		type: "POST",
 		data: {
 			streamKey: streamKey,
