@@ -16,7 +16,7 @@ body {
 	margin: 8px 0;
 }
 .navbar {
-	box-shadow: 0px 0px 5px black
+	box-shadow: 0px 0px 5px #000;
 }
 #error_message_generic {
 	text-align: center;
@@ -62,6 +62,10 @@ body {
 	margin: 10px 0;
 	width: 100%;
 }
+.addToQueue_cont {
+	float: left;
+	width: 50%
+}
 #addToQueue_options {
 	display: none;
 }
@@ -70,13 +74,13 @@ body {
 	margin: 10px 0;
 	width: 100%;
 }
-/* PHONE */
-@media (max-width: 767px) {
-#addToQueue_add.btn {
-	margin-top: 0;
-}
+#addToQueue_promote.btn {
+	margin-right: 5px;
 }
 
+#addToQueue_add.btn {
+	margin-left: 5px;
+}
 
 /* Queue */
 #song_list .item_song {

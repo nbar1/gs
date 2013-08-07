@@ -1,11 +1,13 @@
 <?php
 session_start();
+require('config.php');
 require('db.php');
 require('gsControl.class.php');
 require('api/gsAPI.php');
 
 $gs = new gsControl();
-$gsapi = new gsAPI('nbar1', '1f64634987618265edb26fe236c00011');
+$gs->api_key = $config['tinysong']['key'];
+$gsapi = new gsAPI($config['api']['key'], $config['api']['secret']);
 gsAPI::$headers = array("X-Client-IP: " . $_SERVER['REMOTE_ADDR']);
 
 switch($_REQUEST['f'])
