@@ -347,20 +347,33 @@ class gsControl
 			$output = "<div id='error_message_generic'>No Results Found</div>";
 		}
 		else {
-			$output = "<ul id='song_list'>";
+			$output = "<div id='song_list'>";
 			foreach($results as $k=>$song)
 			{
-				$output .= "<li class='item_song item_search' rel='".$song['SongID']."' onclick=''>";
+				$output .= "<div class='row-fluid item_song item_search' rel='".$song['SongID']."' onclick=''><div class='col-lg-12'>";
 				$output .= "<div class='song_name'>".$song['SongName']."</div>";
 				$output .= "<div class='song_artist'>".$song['ArtistName']."</div>";
 				$output .= "<div class='song_id'>".$song['SongID']."</div>";
-				$output .= "</li>";
+				$output .= "</div></div>";
 			}
-			$output .= "</ul>";
+			$output .= "</div>";
 		}
-		$output .= "<div id='button_queue' class='footer_sticky' onclick=''>back to queue</div>";
-		$output .= "<div id='addToQueue_options' class='footer_sticky'><div id='addToQueue_promote' class='footer_button' onclick=''>promote</div><div id='addToQueue_add' class='footer_button' onclick=''>add to queue</div></div>";
-		$output .= "<div id='addToQueue_response' class='footer_sticky'></div>";
+		$output .= '<div class="navbar navbar-fixed-bottom">
+			<div class="row-fluid" id="backToQueue_options">
+				<div class="col-lg-12">
+					<div id="button_queue" class="btn btn-info" onclick="">back to queue</div>
+				</div>
+			</div>
+			<div class="row-fluid" id="addToQueue_options">
+				<div class="col-lg-6">
+					<div id="addToQueue_promote" class="btn btn-warning" onclick="">promote</div>
+				</div>
+				<div class="col-lg-6">
+					<div id="addToQueue_add" class="btn btn-success" onclick="">add to queue</div>
+				</div>
+			</div>
+			<div class="row-fluid" id="addToQueue_response"></div>
+		</div>';
 
 		return $output;
 	}
@@ -400,8 +413,9 @@ class gsControl
 		global $db;
 		if($this->isAuthenticated() == TRUE)
 		{
-			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
-			$output .= "<ul id='song_list' class='queue'>";
+			//$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
+			$output = "";
+			$output .= "<div id='song_list' class='queue'>";
 
 			$data = array("queued", "playing");
 			$dbh = $db->prepare("SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC");
@@ -411,20 +425,21 @@ class gsControl
 
 			foreach($rows as $row)
 			{
-				$output .= "<li class='item_song ".$row['q_song_priority']." ".$row['q_song_status']."' onclick=''>";
+				$output .= "<div class='row-fluid item_song ".$row['q_song_priority']." ".$row['q_song_status']."' onclick=''><div class='col-lg-12'>";
 				$output .= "<div class='item_status'></div>";
 				$output .= "<div class='song_name'>".$row['q_song_title']."</div>";
 				$output .= "<div class='song_artist'>".$row['q_song_artist']."</div>";
 				$output .= "<div class='song_played_by'>".$this->getNickname($row['q_song_played_by'])."</div>";
 				if($row['q_song_status'] == "playing")
 				{
-					$output .= "<div class='now_playing_marker'>now playing</div>";
+					$output .= "<span class='now_playing_marker label label-info'>now playing</span>";
 				} elseif($row['q_song_priority'] == "high")
 				{
-					$output .= "<div class='high_priority_marker'>promoted</div>";
+					$output .= "<span class='label label-success high_priority_marker'>promoted</span>";
 				}
+				$output .= "<div></div></div></div>";
 			}
-			$output .= "</ul>";
+			$output .= "</div>";
 			return $output;
 		}
 		else {
