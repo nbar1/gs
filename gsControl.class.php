@@ -4,7 +4,7 @@
  */
 class gsControl
 {
-	var $api_key = "a2e5ffd9cc99a2bee6207e4921def6a7"; // This is the TinySong API key for searching
+	public $api_key = ""; // This is the TinySong API key for searching
 	/**
 	 * initializeView
 	 *
@@ -358,17 +358,17 @@ class gsControl
 			}
 			$output .= "</div>";
 		}
-		$output .= '<div class="navbar navbar-fixed-bottom">
+		$output .= '<div style="clear: both;"></div><div class="navbar navbar-fixed-bottom">
 			<div class="row-fluid" id="backToQueue_options">
 				<div class="col-lg-12">
 					<div id="button_queue" class="btn btn-info" onclick="">back to queue</div>
 				</div>
 			</div>
-			<div class="row-fluid" id="addToQueue_options">
-				<div class="col-lg-6">
+			<div class="row" id="addToQueue_options">
+				<div class="addToQueue_cont" style="margin-left: -3px;">
 					<div id="addToQueue_promote" class="btn btn-warning" onclick="">promote</div>
 				</div>
-				<div class="col-lg-6">
+				<div class="addToQueue_cont">
 					<div id="addToQueue_add" class="btn btn-success" onclick="">add to queue</div>
 				</div>
 			</div>
@@ -413,8 +413,8 @@ class gsControl
 		global $db;
 		if($this->isAuthenticated() == TRUE)
 		{
-			//$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
-			$output = "";
+			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
+			//$output = "";
 			$output .= "<div id='song_list' class='queue'>";
 
 			$data = array("queued", "playing");
