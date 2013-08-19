@@ -1,6 +1,6 @@
 <?php
 $config = array(
-  'api' => array( // grooveshark api - you need permission to get an api key
+	'api' => array( // grooveshark api - you need permission to get an api key
 		'key' => '',
 		'secret' => '',
 	),
@@ -9,7 +9,7 @@ $config = array(
 	),
 	'grooveshark' => array(
 		'username' => '',
-		'password' => '',
+		'password' => '', // md5 of grooveshark password
 	),
 );
 ?>
