@@ -106,7 +106,7 @@ class gsControl
 			{
 				$nickname = substr($nickname, 0, 32);
 			}
-			
+
 			$data = array($nickname);
 			$this->dbh = $this->db->prepare("SELECT user_id FROM users WHERE user_nickname=?");
 			$this->dbh->execute($data);
@@ -118,6 +118,7 @@ class gsControl
 				if($this->dbh->execute($data))
 				{
 					setcookie('user', $this->dbh->lastInsertId(), strtotime("+5 years"));
+					header('location: '.$_SERVER['PHP_SELF']);
 					return true;
 				}
 				else {
@@ -128,6 +129,7 @@ class gsControl
 				$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
 				$row = $this->dbh->fetch();
 				setcookie('user', $row['user_id'], strtotime("+5 years"));
+				header('location: '.$_SERVER['PHP_SELF']);
 				return true;
 			}
 		}
@@ -296,7 +298,7 @@ class gsControl
 		$this->dbh = $this->db->prepare("SELECT q_id, q_song_id, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC LIMIT 2");
 		$this->dbh->execute($data);
 		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-		$rows = $this->dbh->fetchAll();	
+		$rows = $this->dbh->fetchAll();
 		$x=0;
 		foreach($rows as $row)
 		{
@@ -402,9 +404,10 @@ class gsControl
 	{
 		if($this->isAuthenticated() === FALSE)
 		{
-			$output = "<div class='setUser_header'>enter your name</div>";
-			$output .= "<input type='text' class='setUser_textbox' id='setUser_textbox' placeholder='name' maxlength='32' />";
-			$output .= "<div id='setUser_submit' onclick=''>submit</div>";
+			
+			$output = "<div class='row-fluid nickview_row'><div class='col-lg-12'><div class='setUser_header'>enter your name</div></div></div>";
+			$output .= "<div class='row-fluid nickview_row'><div class='col-lg-12 setUser_textbox'><input type='text' class='input-lg' id='setUser_textbox' placeholder='name' maxlength='32' /></div></div>";
+			$output .= "<div class='row-fluid nickview_row'><div class='col-lg-12 nickview_submit'><div id='setUser_submit' class='btn btn-lg' onclick=''>submit</div></div></div>";
 			return $output;
 		}
 		else {
@@ -443,8 +446,8 @@ class gsControl
 				if($row['q_song_status'] === "playing")
 				{
 					$output .= "<span class='now_playing_marker label label-info'>now playing</span>";
-				} elseif($row['q_song_priority'] === "high")
-				{
+				}
+				elseif($row['q_song_priority'] === "high") {
 					$output .= "<span class='label label-success high_priority_marker'>promoted</span>";
 				}
 				$output .= "<div></div></div></div>";
