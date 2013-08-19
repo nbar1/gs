@@ -5,12 +5,12 @@ session_start();
 $songID = $_REQUEST['song'];
 
 // Load up API wrapper
-require("gsAPI.php");
+require("../api/gsAPI.php");
 require("../config.php");
 $gsapi = new gsAPI($config['api']['key'], $config['api']['secret']); //This is the GrooveShark PRIVATE API key
 gsAPI::$headers = array("X-Client-IP: " . $_SERVER['REMOTE_ADDR']);
 
-// Session caching stuff
+// Session caching
 if (isset($_SESSION['gsSession']) && !empty($_SESSION['gsSession'])) {
 	$gsapi->setSession($_SESSION['gsSession']);
 } else {
@@ -28,9 +28,8 @@ if (!$_SESSION['gsCountry']) {
 	die("noCountry");
 }
 
-// comment
 // Make request to Grooveshark and return data as JSON
-$loginHelper = $gsapi->login($config['grooveshark']['username'], $config['grooveshark']['password']); // This is my username and MD5'd password
+$loginHelper = $gsapi->login($config['grooveshark']['username'], $config['grooveshark']['password']);
 $streamInfo = $gsapi->getStreamKeyStreamServer($songID, false);
 echo json_encode($streamInfo);
 ?>

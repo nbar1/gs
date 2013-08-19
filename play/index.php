@@ -61,7 +61,7 @@ swfobject.embedSWF("http://grooveshark.com/APIPlayer.swf", "player", "300", "300
 function playSong(songID)
 {
 	$.ajax({
-		url: "../api/songGetter.php",
+		url: "songGetter.php",
 		type: "POST",
 		data: {
 			song: songID

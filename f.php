@@ -1,7 +1,6 @@
 <?php
 session_start();
 require('config.php');
-require('db.php');
 require('gsControl.class.php');
 require('api/gsAPI.php');
 
