@@ -24,7 +24,7 @@ else {
 			break;
 	
 		case 'search':
-			echo $gs->displaySearchView($gs->doSearch($_REQUEST['query']));
+			echo $gs->displaySearchView($gs->getSearchResults($_REQUEST['query']));
 			break;
 	
 		case 'setname':

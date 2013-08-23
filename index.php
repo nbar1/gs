@@ -6,17 +6,6 @@ session_start();
 	<title>gs</title>
 	<link rel="stylesheet" href="assets/stylesheets/bootstrap.css" />
 	<link rel="stylesheet" href="assets/stylesheets/global.css" />
-	<?php
-	$iPod = stripos($_SERVER['HTTP_USER_AGENT'],"iPod");
-	$iPhone = stripos($_SERVER['HTTP_USER_AGENT'],"iPhone");
-	$iPad = stripos($_SERVER['HTTP_USER_AGENT'],"iPad");
-	$Android= stripos($_SERVER['HTTP_USER_AGENT'],"Android");
-	$webOS= stripos($_SERVER['HTTP_USER_AGENT'],"webOS");
-	if($iPod || $iPhone || $iPad)
-	{
-		echo "<link rel=\"stylesheet\" href=\"assets/stylesheets/iDevice.css\" />";
-	}
-	?>
 	<meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=no;"/>
 </head>
 <body>
