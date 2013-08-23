@@ -200,6 +200,22 @@ class gsControl
 	}
 
 	/**
+	 * getQueue
+	 *
+	 * Return an array of the queue
+	 *
+	 * @return array
+	 */
+	function getQueue()
+	{
+		$data = array("queued", "playing");
+		$this->dbh = $this->db->prepare("SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC");
+		$this->dbh->execute($data);
+		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
+		return $this->dbh->fetchAll();
+	}
+
+	/**
 	 * getNextQueuePosition
 	 *
 	 * Returns the next available queue slot
@@ -328,14 +344,14 @@ class gsControl
 	}
 
 	/**
-	 * doSearch
+	 * getSearchResults
 	 *
 	 * Returns an array of search results based on a given query
 	 *
 	 * @param string $query
 	 * @return array
 	 */
-	function doSearch($query)
+	function getSearchResults($query)
 	{
 		$post_url = str_replace(" ", "+", "http://tinysong.com/s/".$query."?format=json&limit=32&key=".$this->api_key);
 		$ch = curl_init();
@@ -427,16 +443,12 @@ class gsControl
 	{
 		if($this->isAuthenticated() === TRUE)
 		{
+			$queue = $this->getQueue();
+
 			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
 			$output .= "<div id='song_list' class='queue'>";
 
-			$data = array("queued", "playing");
-			$this->dbh = $this->db->prepare("SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC");
-			$this->dbh->execute($data);
-			$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-			$rows = $this->dbh->fetchAll();
-
-			foreach($rows as $row)
+			foreach($queue as $row)
 			{
 				$output .= "<div class='row-fluid item_song ".$row['q_song_priority']." ".$row['q_song_status']."' onclick=''><div class='col-lg-12'>";
 				$output .= "<div class='item_status'></div>";
