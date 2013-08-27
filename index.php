@@ -25,7 +25,6 @@ session_start();
 	</div>
 </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript" src="assets/javascripts/bootstrap.min.js"></script>
 <script type="text/javascript" src="assets/javascripts/global.js"></script>
 </script>

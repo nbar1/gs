@@ -92,6 +92,16 @@ body {
    to {transform: rotate(359deg);}
 }
 
+/**
+ * Search
+ */
+.moreoptions {
+	display: none;
+	margin-top: -7px;
+}
+#song_list.search {
+	margin-bottom: 53px;
+}
 
 
 
@@ -168,16 +178,23 @@ body {
 /* Queue */
 #song_list .item_song {
 	background: #efefef;
-	border-bottom: 1px solid #000;
+	border-bottom: 1px solid #999;
 }
 #song_list .item_song.selected {
 	background: #ddd;
 }
 .item_song {
+	height: 70px;
 	padding: 15px 0;
+}
+.queue .item_song {
+	height: auto;
 }
 .item_song .song_name {
 	font-size: 16px;
+	height: 22px;
+	overflow: hidden;
+	width: 100%;
 }
 .item_song .song_artist {
 	color: #666;
@@ -247,4 +264,7 @@ body {
 	position: fixed;
 	top: 0px;
 	width: 100%;
+}
+.clearfloat {
+	clear: both;
 }

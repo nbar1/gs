@@ -17,12 +17,19 @@ function reloadQueue() {
 	}
 }
 
+function showLoader() {
+	$("#loader").show();
+}
+function hideLoader() {
+	$("#loader").hide();
+}
+
 /*
  * Load queue initially
  */
 $.post('f.php?f=initialize', function(data) {
 	loadIntoContentLoader(data, 'queue');
-	$("#loader").hide();
+	hideLoader();
 });
 
 /*
@@ -30,10 +37,10 @@ $.post('f.php?f=initialize', function(data) {
  */
 $('#search_submit').click(function() {
 	$('#search_input').blur();
-	$("#loader").fadeIn();
+	showLoader();
 	$.post('f.php?f=search', { query : $('#search_input').val() }, function(data) {
 		loadIntoContentLoader(data, 'search');
-		$("#loader").hide();
+		hideLoader();
 	});
 });
 $('#search_input').bind('keypress', function(e) {
@@ -43,52 +50,44 @@ $('#search_input').bind('keypress', function(e) {
 	}
 });
 $('#button_queue').live('click', function() {
-	$("#loader").fadeIn();
+	showLoader();
 	$.post('f.php?f=queue', function(data) {
 		loadIntoContentLoader(data, 'queue');
 		$('#search_input').val("");
-		$("#loader").hide();
+		hideLoader();
 	});
 });
 
 /*
  * Add to queue options
  */
-$('.item_search').live('click', function() {
+$('.item_search.closed').live('click', function() {
+	$('.moreoptions').hide(0);
+	$('.songinfo').show(0);
+	$('.item_search').addClass('closed');
+	$(this).removeClass('closed');
 	selectedSong = new Array($(this).attr('rel'), $(this).children('div').children('.song_name').html(), $(this).children('div').children('.song_artist').html());
 	console.log(selectedSong);
-	$('#addToQueue_response').hide();
-	$('#backToQueue_options').fadeOut(function() {
-		$('#addToQueue_options').fadeIn();
-	});
-	$('.selected').removeClass('selected');
-	$(this).addClass('selected');
+	$(this).children('.songinfo').hide(0);
+	$(this).children('.moreoptions').show(0);
 });
-$(window).scroll(function() {
-	if($('#addToQueue_options').is(":visible"))
-	{
-		$('#addToQueue_options').fadeOut(function() {
-			$('#backToQueue_options').fadeIn();
-		});
-		$('.selected').removeClass('selected');
-	}
-});
+
 $('#addToQueue_add').live('click', function() {
 	addToQueue(selectedSong, "low");
 });
+
 $('#addToQueue_promote').live('click', function() {
 	addToQueue(selectedSong, "high");
 });
+
 function addToQueue(song, priority) {
 	console.log(song);
 	$.post('f.php?f=add', {songID:song[0], songTitle:song[1], songArtist:song[2], songPriority:priority }, function(data) {
-		$('#addToQueue_response').html('<div class="col-lg-12 response_text btn btn-success">'+data+'</div>');
+		//$('#addToQueue_response').html('<div class="col-lg-12 response_text btn btn-success">'+data+'</div>');
 		console.log(data);
-		$('#addToQueue_options').fadeOut(function() {
-			$('.selected').removeClass('selected');
-			$('#addToQueue_response').fadeIn();
-			var t = setTimeout("$('#addToQueue_response').fadeOut(function(){$('#backToQueue_options').fadeIn();$('#addToQueue_options').hide();});", 3000);
-		});
+		$('.moreoptions').hide(0, function(){
+			$('.songinfo').show0();
+		})
 	});
 }
 
