@@ -1,8 +1,6 @@
 <?php
 /*
- * gsControl
- *
- * Controls the flow for viewing song queue and searching for songs
+ * Song
  */
 class gsControl
 {
@@ -380,18 +378,11 @@ class gsControl
 			$output = "<div id='song_list'>";
 			foreach($results as $k=>$song)
 			{
-				$output .= "
-				<div class='row-fluid item_song item_search front' rel='".$song['SongID']."' onclick=''>
-					<div class='col-lg-12'>
-						<div class='card'>
-							<div class='front'>
-								<div class='song_name'>".$song['SongName']."</div>
-								<div class='song_artist'>".$song['ArtistName']."</div>
-								<div class='song_id'>".$song['SongID']."</div>
-							</div>
-						</div>
-					</div>
-				</div>";
+				$output .= "<div class='row-fluid item_song item_search' rel='".$song['SongID']."' onclick=''><div class='col-lg-12'>";
+				$output .= "<div class='song_name'>".$song['SongName']."</div>";
+				$output .= "<div class='song_artist'>".$song['ArtistName']."</div>";
+				$output .= "<div class='song_id'>".$song['SongID']."</div>";
+				$output .= "</div></div>";
 			}
 			$output .= "</div>";
 		}

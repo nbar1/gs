@@ -1,16 +1,15 @@
 <?php
 /*
- * gsControl
+ * Models_Queue
  *
- * Controls the flow for viewing song queue and searching for songs
+ * Model for Queue
  */
-class gsControl
+class Models_Queue
 {
-
 	/**
 	 * database object
 	 */
-	public $db;
+	private $db;
 
 	/**
 	 * __construct
@@ -22,181 +21,6 @@ class gsControl
 		require('config.php');
 		$this->db = new PDO("mysql:host={$config['database']['host']};dbname={$config['database']['db_name']}", $config['database']['user'], $config['database']['password']);
 		$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	}
-
-	/**
-	 * initializeView
-	 *
-	 * Displays queue or nickname setup based on user authentication state
-	 * The return of this function will be displayed to the screen as HTML
-	 *
-	 * @return function
-	 */
-	function initializeView()
-	{
-		if($this->isAuthenticated() === TRUE)
-		{
-			$data = array(date("Y-m-d H:i:s"), $this->getUserID());
-			$this->dbh = $this->db->prepare("UPDATE users SET user_lastlogin=? WHERE user_id=?");
-			$this->dbh->execute($data);
-			return $this->displayQueueView();
-		}
-		else {
-			return $this->displayNicknameView();
-		}
-	}
-
-	/**
-	 * isAuthenticated
-	 *
-	 * Returns whether the current user is authenticated
-	 *
-	 * @return bool
-	 */
-	function isAuthenticated()
-	{
-		if(isset($_COOKIE['user']))
-		{
-			$data = array($this->getUserID());
-			$this->dbh = $this->db->prepare("SELECT user_id FROM users WHERE user_id=?");
-			$this->dbh->execute($data);
-			if($this->dbh->rowCount() > 0)
-			{
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getUserID
-	 *
-	 * Get the current users userID
-	 *
-	 * @return int
-	 */
-	function getUserID()
-	{
-		if($_COOKIE['user'])
-		{
-			return $_COOKIE['user'];
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * setNickname
-	 *
-	 * Set the current users Nickname
-	 *
-	 * @return bool
-	 */
-	function setNickname($nickname)
-	{
-		if($this->isAuthenticated() === FALSE)
-		{
-			if(strlen($nickname) > 32)
-			{
-				$nickname = substr($nickname, 0, 32);
-			}
-
-			$data = array($nickname);
-			$this->dbh = $this->db->prepare("SELECT user_id FROM users WHERE user_nickname=?");
-			$this->dbh->execute($data);
-			if($this->dbh->rowCount() < 1)
-			{
-				// Continue with creating user
-				$data = array($nickname, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'));
-				$this->dbh = $this->db->prepare("INSERT INTO users (user_nickname, user_created, user_lastlogin) VALUES (?, ?, ?)");
-				if($this->dbh->execute($data))
-				{
-					setcookie('user', $this->dbh->lastInsertId(), strtotime("+5 years"));
-					header('location: '.$_SERVER['PHP_SELF']);
-					return true;
-				}
-				else {
-					return false;
-				}
-			}
-			else {
-				$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-				$row = $this->dbh->fetch();
-				setcookie('user', $row['user_id'], strtotime("+5 years"));
-				header('location: '.$_SERVER['PHP_SELF']);
-				return true;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getNickname
-	 *
-	 * Return nickname of given userID
-	 *
-	 * @param $userID
-	 * @return string
-	 */
-	function getNickname($userID = FALSE)
-	{
-		if($userID === FALSE)
-		{
-			$userID = $this->getUserID();
-		}
-		if($userID <> FALSE)
-		{
-			$data = array($userID);
-			$this->dbh = $this->db->prepare("SELECT user_nickname FROM users WHERE user_id=?");
-			$this->dbh->execute($data);
-			$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-			$row = $this->dbh->fetch();
-			return $row['user_nickname'];
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getAvailablePromotions
-	 *
-	 * Returns available promotions for given userID
-	 *
-	 * @param $userID
-	 * @return int
-	 */
-	function getAvailablePromotions($userID=FALSE)
-	{
-		$maxPromotions = 3;
-		if($userID === FALSE)
-		{
-			$userID = $this->getUserID();
-		}
-		if($userID <> FALSE)
-		{
-			$data = array("high", "med", $userID);
-			$this->dbh = $this->db->prepare("SELECT * FROM queue WHERE q_song_priority=? OR q_song_priority=? AND q_song_played_by=? AND q_song_added_ts >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
-			if($this->dbh->execute($data))
-			{
-				$availablePromotions = $maxPromotions - $this->dbh->rowCount();
-				return $availablePromotions;
-			}
-			else {
-				return 0;
-			}
-		}
-		else {
-			return 0;
-		}
 	}
 
 	/**
@@ -243,12 +67,12 @@ class gsControl
 	 *
 	 * Returns whether the given songID is already queued
 	 *
-	 * @param int $songID
+	 * @param Song $song
 	 * @return bool
 	 */
-	function isSongInQueue($songID)
+	function isSongInQueue(Song $song)
 	{
-		$data = array("queued", $songID);
+		$data = array("queued", $song->getId());
 		$this->dbh = $this->db->prepare("SELECT q_id FROM queue WHERE q_song_status=? AND q_song_id=? LIMIT 1");
 		$this->dbh->execute($data);
 		if($this->dbh->rowCount() > 0)
@@ -265,27 +89,28 @@ class gsControl
 	 *
 	 * Adds a given song to the queue
 	 *
-	 * @param int $songID
+	 * @param Song $song
 	 * @param string $songPriority
-	 * @param string $songArtist
-	 * @param string $songTitle
 	 * @return string
 	 */
-	function addSongToQueue($songID, $songPriority, $songArtist, $songTitle)
+	function addSongToQueue(Song $song)
 	{
-		if($this->isSongInQueue($songID) === FALSE)
+		if($this->isSongInQueue($song->getId()) === FALSE)
 		{
+			/*
+			// Have to check for this in $song->request();
 			if($this->getAvailablePromotions() < 1)
 			{
 				$songPriority = "low";
 			}
-			$data = array($songID, $songTitle, $songArtist, $songPriority, $this->getNextQueuePosition(), date("Y-m-d H:i:s"), $this->getUserID());
+			*/
+			$data = array($song->getId(), $song->getTitle(), $song->getArtist(), $song->getPriority(), $this->getNextQueuePosition(), date("Y-m-d H:i:s"), User::getId());
 			$this->dbh = $this->db->prepare("INSERT INTO queue (q_song_id, q_song_title, q_song_artist, q_song_priority, q_song_position, q_song_added_ts, q_song_played_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			if($this->dbh->execute($data))
 			{
 				if($songPriority === "high")
 				{
-					return "song promoted";
+					$song->setStatus('promoted');
 				}
 				else {
 					return "song added";
@@ -297,6 +122,7 @@ class gsControl
 		}
 		else {
 			return "song already queued";
+			return $song->Upvote();
 		}
 	}
 
@@ -380,18 +206,11 @@ class gsControl
 			$output = "<div id='song_list'>";
 			foreach($results as $k=>$song)
 			{
-				$output .= "
-				<div class='row-fluid item_song item_search front' rel='".$song['SongID']."' onclick=''>
-					<div class='col-lg-12'>
-						<div class='card'>
-							<div class='front'>
-								<div class='song_name'>".$song['SongName']."</div>
-								<div class='song_artist'>".$song['ArtistName']."</div>
-								<div class='song_id'>".$song['SongID']."</div>
-							</div>
-						</div>
-					</div>
-				</div>";
+				$output .= "<div class='row-fluid item_song item_search' rel='".$song['SongID']."' onclick=''><div class='col-lg-12'>";
+				$output .= "<div class='song_name'>".$song['SongName']."</div>";
+				$output .= "<div class='song_artist'>".$song['ArtistName']."</div>";
+				$output .= "<div class='song_id'>".$song['SongID']."</div>";
+				$output .= "</div></div>";
 			}
 			$output .= "</div>";
 		}
