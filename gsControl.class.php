@@ -377,19 +377,24 @@ class gsControl
 			$output = "<div id='error_message_generic'>No Results Found</div>";
 		}
 		else {
-			$output = "<div id='song_list'>";
+			$output = "<div id='song_list' class='search'>";
 			foreach($results as $k=>$song)
 			{
 				$output .= "
-				<div class='row-fluid item_song item_search front' rel='".$song['SongID']."' onclick=''>
-					<div class='col-lg-12'>
-						<div class='card'>
-							<div class='front'>
+				<div class='row-fluid item_song item_search closed front' rel='".$song['SongID']."' onclick=''>
+					<div class='col-lg-12 songinfo'>
 								<div class='song_name'>".$song['SongName']."</div>
 								<div class='song_artist'>".$song['ArtistName']."</div>
 								<div class='song_id'>".$song['SongID']."</div>
-							</div>
+					</div>
+					<div class='col-lg-12 moreoptions'>
+						<div class='addToQueue_cont' style='margin-left: -3px;'>
+							<div id='addToQueue_promote' class='btn btn-warning' onclick=''>promote</div>
 						</div>
+						<div class='addToQueue_cont'>
+							<div id='addToQueue_add' class='btn btn-success' onclick=''>add to queue</div>
+						</div>
+						<div class='clearfloat'></div>
 					</div>
 				</div>";
 			}
