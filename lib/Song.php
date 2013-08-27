@@ -4,13 +4,9 @@
  *
  * Controls the flow for viewing song queue and searching for songs
  */
-class gsControl
+class Song extends GS
 {
-
-	/**
-	 * database object
-	 */
-	public $db;
+	protected $params;
 
 	/**
 	 * __construct
@@ -19,223 +15,7 @@ class gsControl
 	 */
 	public function __construct()
 	{
-		require('config.php');
-		$this->db = new PDO("mysql:host={$config['database']['host']};dbname={$config['database']['db_name']}", $config['database']['user'], $config['database']['password']);
-		$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	}
-
-	/**
-	 * initializeView
-	 *
-	 * Displays queue or nickname setup based on user authentication state
-	 * The return of this function will be displayed to the screen as HTML
-	 *
-	 * @return function
-	 */
-	function initializeView()
-	{
-		if($this->isAuthenticated() === TRUE)
-		{
-			$data = array(date("Y-m-d H:i:s"), $this->getUserID());
-			$this->dbh = $this->db->prepare("UPDATE users SET user_lastlogin=? WHERE user_id=?");
-			$this->dbh->execute($data);
-			return $this->displayQueueView();
-		}
-		else {
-			return $this->displayNicknameView();
-		}
-	}
-
-	/**
-	 * isAuthenticated
-	 *
-	 * Returns whether the current user is authenticated
-	 *
-	 * @return bool
-	 */
-	function isAuthenticated()
-	{
-		if(isset($_COOKIE['user']))
-		{
-			$data = array($this->getUserID());
-			$this->dbh = $this->db->prepare("SELECT user_id FROM users WHERE user_id=?");
-			$this->dbh->execute($data);
-			if($this->dbh->rowCount() > 0)
-			{
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getUserID
-	 *
-	 * Get the current users userID
-	 *
-	 * @return int
-	 */
-	function getUserID()
-	{
-		if($_COOKIE['user'])
-		{
-			return $_COOKIE['user'];
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * setNickname
-	 *
-	 * Set the current users Nickname
-	 *
-	 * @return bool
-	 */
-	function setNickname($nickname)
-	{
-		if($this->isAuthenticated() === FALSE)
-		{
-			if(strlen($nickname) > 32)
-			{
-				$nickname = substr($nickname, 0, 32);
-			}
-
-			$data = array($nickname);
-			$this->dbh = $this->db->prepare("SELECT user_id FROM users WHERE user_nickname=?");
-			$this->dbh->execute($data);
-			if($this->dbh->rowCount() < 1)
-			{
-				// Continue with creating user
-				$data = array($nickname, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'));
-				$this->dbh = $this->db->prepare("INSERT INTO users (user_nickname, user_created, user_lastlogin) VALUES (?, ?, ?)");
-				if($this->dbh->execute($data))
-				{
-					setcookie('user', $this->dbh->lastInsertId(), strtotime("+5 years"));
-					header('location: '.$_SERVER['PHP_SELF']);
-					return true;
-				}
-				else {
-					return false;
-				}
-			}
-			else {
-				$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-				$row = $this->dbh->fetch();
-				setcookie('user', $row['user_id'], strtotime("+5 years"));
-				header('location: '.$_SERVER['PHP_SELF']);
-				return true;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getNickname
-	 *
-	 * Return nickname of given userID
-	 *
-	 * @param $userID
-	 * @return string
-	 */
-	function getNickname($userID = FALSE)
-	{
-		if($userID === FALSE)
-		{
-			$userID = $this->getUserID();
-		}
-		if($userID <> FALSE)
-		{
-			$data = array($userID);
-			$this->dbh = $this->db->prepare("SELECT user_nickname FROM users WHERE user_id=?");
-			$this->dbh->execute($data);
-			$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-			$row = $this->dbh->fetch();
-			return $row['user_nickname'];
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * getAvailablePromotions
-	 *
-	 * Returns available promotions for given userID
-	 *
-	 * @param $userID
-	 * @return int
-	 */
-	function getAvailablePromotions($userID=FALSE)
-	{
-		$maxPromotions = 3;
-		if($userID === FALSE)
-		{
-			$userID = $this->getUserID();
-		}
-		if($userID <> FALSE)
-		{
-			$data = array("high", "med", $userID);
-			$this->dbh = $this->db->prepare("SELECT * FROM queue WHERE q_song_priority=? OR q_song_priority=? AND q_song_played_by=? AND q_song_added_ts >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
-			if($this->dbh->execute($data))
-			{
-				$availablePromotions = $maxPromotions - $this->dbh->rowCount();
-				return $availablePromotions;
-			}
-			else {
-				return 0;
-			}
-		}
-		else {
-			return 0;
-		}
-	}
-
-	/**
-	 * getQueue
-	 *
-	 * Return an array of the queue
-	 *
-	 * @return array
-	 */
-	function getQueue()
-	{
-		$data = array("queued", "playing");
-		$this->dbh = $this->db->prepare("SELECT q_id, q_song_id, q_song_title, q_song_artist, q_song_played_by, q_song_priority, q_song_position, q_song_status FROM queue WHERE q_song_status=? OR q_song_status=? ORDER BY q_song_status ASC, q_song_priority ASC, q_song_position ASC");
-		$this->dbh->execute($data);
-		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-		return $this->dbh->fetchAll();
-	}
-
-	/**
-	 * getNextQueuePosition
-	 *
-	 * Returns the next available queue slot
-	 *
-	 * @return int
-	 */
-	function getNextQueuePosition()
-	{
-		$this->dbh = $this->db->prepare("SELECT MAX(q_song_position) FROM queue");
-		$this->dbh->execute();
-		$songPosition = $this->dbh->fetchColumn();
-
-		if(!$songPosition)
-		{
-			$songPosition = 1;
-		}
-		else {
-			$songPosition++;
-		}
-		return $songPosition;
+		$this->setModel("GS_Model_Song");
 	}
 
 	/**
@@ -243,21 +23,12 @@ class gsControl
 	 *
 	 * Returns whether the given songID is already queued
 	 *
-	 * @param int $songID
 	 * @return bool
 	 */
-	function isSongInQueue($songID)
+	function isSongInQueue()
 	{
-		$data = array("queued", $songID);
-		$this->dbh = $this->db->prepare("SELECT q_id FROM queue WHERE q_song_status=? AND q_song_id=? LIMIT 1");
-		$this->dbh->execute($data);
-		if($this->dbh->rowCount() > 0)
-		{
-			return true;
-		}
-		else {
-			return false;
-		}
+		$queue = new Queue();
+		return $queue->isSongInQueue($this);
 	}
 
 	/**
@@ -380,18 +151,11 @@ class gsControl
 			$output = "<div id='song_list'>";
 			foreach($results as $k=>$song)
 			{
-				$output .= "
-				<div class='row-fluid item_song item_search front' rel='".$song['SongID']."' onclick=''>
-					<div class='col-lg-12'>
-						<div class='card'>
-							<div class='front'>
-								<div class='song_name'>".$song['SongName']."</div>
-								<div class='song_artist'>".$song['ArtistName']."</div>
-								<div class='song_id'>".$song['SongID']."</div>
-							</div>
-						</div>
-					</div>
-				</div>";
+				$output .= "<div class='row-fluid item_song item_search' rel='".$song['SongID']."' onclick=''><div class='col-lg-12'>";
+				$output .= "<div class='song_name'>".$song['SongName']."</div>";
+				$output .= "<div class='song_artist'>".$song['ArtistName']."</div>";
+				$output .= "<div class='song_id'>".$song['SongID']."</div>";
+				$output .= "</div></div>";
 			}
 			$output .= "</div>";
 		}
