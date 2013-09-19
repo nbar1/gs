@@ -1,13 +1,32 @@
 <?php
 session_start();
 require('config.php');
-require('gsControl.class.php');
+require('api/gsControl.php');
 require('api/gsAPI.php');
 
 $gs = new gsControl();
 $gs->api_key = $config['tinysong']['key'];
 $gsapi = new gsAPI($config['api']['key'], $config['api']['secret']);
-gsAPI::$headers = array("X-Client-IP: " . $_SERVER['REMOTE_ADDR']);
+// Session caching
+if (isset($_SESSION['gsSession']) && !empty($_SESSION['gsSession']))
+{
+	$gsapi->setSession($_SESSION['gsSession']);
+}
+else {
+	$_SESSION['gsSession'] = $gsapi->startSession();
+}
+
+// Country caching
+if (isset($_SESSION['gsCountry']) && !empty($_SESSION['gsCountry']))
+{
+	$gsapi->setCountry($_SESSION['gsCountry']);
+}
+else {
+	$_SESSION['gsCountry'] = $gsapi->getCountry();
+}
+$country = $gsapi->getCountry();
+$user = $gsapi->authenticate($config['grooveshark']['username'], $config['grooveshark']['password']);
+
 
 if(!isset($_REQUEST['f']))
 {
@@ -40,7 +59,7 @@ else {
 			echo $gsapi->markStreamKeyOver30Secs($_REQUEST['streamKey'], $_REQUEST['streamServerID']);
 			break;
 		case 'getSongInfo':
-			echo $gsapi->getSongInfo($_REQUEST['song']);
+			echo $gs->getSongInfo($_REQUEST['song']);
 			break;
 		case 'getNextSong':
 			echo $gs->getNextSong();

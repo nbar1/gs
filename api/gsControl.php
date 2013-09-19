@@ -10,7 +10,7 @@ class gsControl
 	/**
 	 * database object
 	 */
-	public $db;
+	protected $db;
 
 	/**
 	 * __construct
@@ -167,14 +167,14 @@ class gsControl
 	}
 
 	/**
-	 * getAvailablePromotions
+	 * getUserAvailablePromotions
 	 *
 	 * Returns available promotions for given userID
 	 *
 	 * @param $userID
 	 * @return int
 	 */
-	function getAvailablePromotions($userID=FALSE)
+	function getUserAvailablePromotions($userID=FALSE)
 	{
 		$maxPromotions = 3;
 		if($userID === FALSE)
@@ -275,7 +275,7 @@ class gsControl
 	{
 		if($this->isSongInQueue($songID) === FALSE)
 		{
-			if($this->getAvailablePromotions() < 1)
+			if($this->getUserAvailablePromotions() < 1)
 			{
 				$songPriority = "low";
 			}
@@ -344,6 +344,23 @@ class gsControl
 	}
 
 	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	function getSongInfo($songID)
+	{
+		$data = array($songID);
+		$this->dbh = $this->db->prepare("SELECT q_song_title, q_song_artist FROM queue WHERE q_song_id=? LIMIT 1");
+		$this->dbh->execute($data);
+		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
+		return json_encode($this->dbh->fetch());
+	}
+
+	/**
 	 * getSearchResults
 	 *
 	 * Returns an array of search results based on a given query
@@ -381,7 +398,7 @@ class gsControl
 			foreach($results as $k=>$song)
 			{
 				$output .= "
-				<div class='row-fluid item_song item_search closed front' rel='".$song['SongID']."' onclick=''>
+				<div class='row-fluid item_song item_search' rel='".$song['SongID']."' onclick=''>
 					<div class='col-lg-12 songinfo'>
 								<div class='song_name'>".$song['SongName']."</div>
 								<div class='song_artist'>".$song['ArtistName']."</div>
@@ -462,7 +479,7 @@ class gsControl
 
 			foreach($queue as $row)
 			{
-				$output .= "<div class='row-fluid item_song ".$row['q_song_priority']." ".$row['q_song_status']."' onclick=''><div class='col-lg-12'>";
+				$output .= "<div class='row-fluid item_song ".$row['q_song_priority']." ".$row['q_song_status']."' rel='".$row['q_song_id']."' onclick=''><div class='col-lg-12'>";
 				$output .= "<div class='item_status'></div>";
 				$output .= "<div class='song_name'>".$row['q_song_title']."</div>";
 				$output .= "<div class='song_artist'>".$row['q_song_artist']."</div>";
