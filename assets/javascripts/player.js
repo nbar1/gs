@@ -11,6 +11,7 @@ function playSong(songID) {
 				song: songID
 			},
 			success: function(response) {
+				console.log(response);
 				var responseData = $.parseJSON(response);
 				window.player.playStreamKey(responseData.StreamKey, responseData.StreamServerHostname, responseData.StreamServerID);
 				var streamKey = responseData.StreamKey;
@@ -50,9 +51,10 @@ function getSongInfo(songID) {
 			song: songID
 		},
 		success: function(response){
+			console.log(response);
 			var songInfo = $.parseJSON(response);
-			$('#currentSong .songTitle').html(songInfo.SongName);
-			$('#currentSong .songArtist').html(songInfo.ArtistName);
+			$('#currentSong .songTitle').html(songInfo.q_song_title);
+			$('#currentSong .songArtist').html(songInfo.q_song_artist);
 		}
 	});
 }

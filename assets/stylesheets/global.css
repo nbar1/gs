@@ -97,7 +97,7 @@ body {
  */
 .moreoptions {
 	display: none;
-	margin-top: -7px;
+	margin-top: 10px;
 }
 #song_list.search {
 	margin-bottom: 53px;
@@ -184,7 +184,8 @@ body {
 	background: #ddd;
 }
 .item_song {
-	height: 70px;
+	height: auto;
+	min-height: 70px;
 	padding: 15px 0;
 }
 .queue .item_song {
