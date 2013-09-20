@@ -474,7 +474,7 @@ class gsControl
 		{
 			$queue = $this->getQueue();
 
-			$output = "<script>var t=setTimeout(\"reloadQueue()\", 15000);</script>";
+			$output = "<script>var t=setTimeout(\"gs.reloadQueue()\", 15000);</script>";
 			$output .= "<div id='song_list' class='queue'>";
 
 			foreach($queue as $row)
