@@ -152,9 +152,10 @@ gs = {
 	 * Show information modal
 	 */
 	showModal: function(data, time) {
-		$('#modal').html(data).css('opacity', '0.6');
+		$('#modal').html(data).css({'opacity':'0.6', 'height':'auto', 'padding':'10px'});
 		var hideModal = setTimeout(function() {
-			$('#modal').css('opacity', '0');
+			$('#modal').css({'opacity':'0'});
+			var hideModal = setTimeout(function(){ $('#modal').css({'height':'0', 'padding':'0'}); }, 500)
 		}, time);
 	}
 }
