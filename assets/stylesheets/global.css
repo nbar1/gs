@@ -96,8 +96,12 @@ body {
  * Search
  */
 .moreoptions {
-	display: none;
-	margin-top: 10px;
+	height: 0;
+	overflow: hidden;
+	-moz-transition: height 0.5s ease-in-out;
+	-ms-transition: height 0.5s ease-in-out;
+	-webkit-transition: height 0.5s ease-in-out;
+	transition: height 0.5s ease-in-out;
 }
 #song_list.search {
 	margin-bottom: 53px;
@@ -258,14 +262,23 @@ body {
 /* Modal */
 #modal {
 	background: #000;
-	display: none;
-	height: 100%;
-	left: 0px;
-	opacity: 0.8;
+	color: #fff;
+	font-size: 24px;
+	height: auto;
+	left: 0;
+	opacity: 0;
+	padding: 10px;
 	position: fixed;
-	top: 0px;
+	text-align: center;
+	top: 47%;
+	-moz-transition: opacity 0.5s ease-in-out;
+	-ms-transition: opacity 0.5s ease-in-out;
+	-webkit-transition: opacity 0.5s ease-in-out;
+	transition: opacity 0.5s ease-in-out;
 	width: 100%;
 }
+
+/* Clear */
 .clearfloat {
 	clear: both;
 }
