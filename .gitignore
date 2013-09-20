@@ -1,5 +1,2 @@
-db.php
-config.php
 *.swp
 *.ico
-api/**/*
