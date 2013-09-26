@@ -5,7 +5,7 @@
  * Contains information about a new or currently queued song
  */
 
-class Song extends gs
+class Song extends Base
 {
 	/**
 	 * Song ID
@@ -301,7 +301,7 @@ class Song extends gs
 	{
 		if (isset($this->id))
 		{
-			$this->dbh = $this->db->prepare("SELECT token, title, artist, played_by, promoted_by, priority, position, status FROM queue WHERE id=? LIMIT 1");
+			$this->dbh = $this->db->prepare("SELECT songs.token, songs.title, songs.artist, queue.played_by, queue.promoted_by, queue.priority, queue.position, queue.status FROM songs, queue WHERE queue.id=? GROUP BY token");
 			$this->dbh->execute(array($this->id));
 			if ($this->dbh->rowCount() > 0)
 			{
@@ -357,5 +357,31 @@ class Song extends gs
 		}
 	}
 
+	/**
+	 * Store Metadata
+	 *
+	 * Store song metadata in database
+	 *
+	 * @return bool
+	 */
+	public function storeMetadata()
+	{
+		$this->dbh = $this->db->prepare('INSERT INTO songs (token, title, artist) VALUES (?, ?, ?)');
+		return $this->dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist()));
+	}
+
+	/**
+	 * Has Metadata
+	 *
+	 * Check the database to see if the song has metadata stored
+	 *
+	 * @return bool
+	 */
+	public function hasMetadata()
+	{
+		$this->dbh = $this->db->prepare("SELECT id FROM songs WHERE token=? LIMIT 1");
+		$this->dbh->execute(array($this->getToken()));
+		return ($this->dbh->rowCount() > 0) ? true : false;
+	}
 }
 ?>

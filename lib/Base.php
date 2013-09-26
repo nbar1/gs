@@ -1,16 +1,16 @@
 <?php
 /*
- * gs
+ * Base
  *
  * Base class for all gs classes
  */
-class gs
+class Base
 {
 
 	/**
 	 * database object
 	 */
-	protected $db;
+	public $db;
 
 	/**
 	 * Constructor
