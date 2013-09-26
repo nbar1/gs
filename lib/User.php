@@ -5,7 +5,7 @@
  * Contains information about an authenticated user
  */
 
-class User extends gs
+class User extends Base
 {
 	/**
 	 * User ID
@@ -139,10 +139,9 @@ class User extends gs
 	public function getAvailablePromotions()
 	{
 		$maxPromotions = 3;
-		$this->dbh = $this->db->prepare("SELECT * FROM queue WHERE priority IN(?, ?) AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
-		if($this->dbh->execute(array("high", "med", $this->getId())))
+		$this->dbh = $this->db->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
+		if($this->dbh->execute(array($this->getId())))
 		{
-			var_dump($this->dbh->fetchAll(PDO::FETCH_ASSOC));
 			$availablePromotions = $maxPromotions - $this->dbh->rowCount();
 			return $availablePromotions;
 		}
@@ -227,6 +226,5 @@ class User extends gs
 			return $this->createUser($nickname);
 		}
 	}
-	
 }
 ?>

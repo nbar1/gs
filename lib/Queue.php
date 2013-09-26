@@ -5,7 +5,7 @@
  * Contains information about the current queue
  */
 
-class Queue extends gs
+class Queue extends Base
 {
 	/**
 	 * Constructor
@@ -18,12 +18,12 @@ class Queue extends gs
 	/**
 	 * Get Queue
 	 *
-	 * @return Array Queued songs
+	 * @return array Queued songs
 	 */
-	public static function getQueue()
+	public function getQueue()
 	{
-		$this->dbh = $this->db->prepare("SELECT * FROM queue WHERE status=? OR status=? ORDER BY status ASC, priority ASC, position ASC");
-		$this->dbh->execute(array("queued", "playing"));
+		$this->dbh = $this->db->prepare("SELECT songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE queue.status IN('queued', 'playing') ORDER BY queue.status ASC, queue.priority ASC, queue.position ASC");
+		$this->dbh->execute();
 		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
 		return $this->dbh->fetchAll();
 	}
@@ -33,8 +33,9 @@ class Queue extends gs
 	 *
 	 * @param Song Song to be added
 	 * @param User User that added song
+	 * @return string Message sent to user
 	 */
-	public static function addSongToQueue(Song $song, User $user)
+	public function addSongToQueue(Song $song, User $user)
 	{
 		if($this->isSongInQueue($song->getToken())) return 'song already queued';
 		if($user->getAvailablePromotions() < 1) $song->setPriority('low');
@@ -42,17 +43,16 @@ class Queue extends gs
 
 		$data = array(
 			$song->getToken(),
-			$song->getTitle(),
-			$song->getArtist(),
 			$song->getPriority(),
-			self::getNextQueuePosition(),
+			$this->getNextQueuePosition(),
 			date("Y-m-d H:i:s"),
 			$user->getId(),
 			$promoted_user,
 		);
-		$this->dbh = $this->db->prepare('INSERT INTO queue (token, title, artist, priority, position, ts_added, played_by, promoted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+		$this->dbh = $this->db->prepare('INSERT INTO queue (token, priority, position, ts_added, played_by, promoted_by) VALUES (?, ?, ?, ?, ?, ?)');
 		if($this->dbh->execute($data))
 		{
+			if($song->hasMetadata() === false) $song->storeMetadata();
 			if($song->getPriority() === 'high') return 'song promoted';
 			else return 'song added';
 		}
@@ -62,14 +62,15 @@ class Queue extends gs
 	}
 
 	/**
-	 * Promite Song In Queue
+	 * Promote Song In Queue
 	 *
 	 * @param Song Song to be promoted
 	 * @param User User that promoted song
+	 * @return string Message sent to user
 	 */
-	public static function promoteSongInQueue(Song $song, User $user)
+	public function promoteSongInQueue(Song $song, User $user)
 	{
-		if(!self::isSongInQueue($song->getToken())) return 'song is not queued';
+		if(!$this->isSongInQueue($song->getToken())) return 'song is not queued';
 		if($user->getAvailablePromotions() < 1) return 'no available promotions';
 
 		$this->dbh = $this->db->prepare('UPDATE queue SET priority=?, promoted_by=? WHERE id=?');
@@ -80,17 +81,15 @@ class Queue extends gs
 	/**
 	 * Is Song In Queue
 	 *
-	 * @param int Song ID
+	 * @param string Token of song
 	 * @return bool
 	 */
-	private static function isSongInQueue($token)
+	private function isSongInQueue($token)
 	{
-		echo $token;
-		$this->dbh = $this->db->prepare("SELECT id FROM queue WHERE status=? AND token=? LIMIT 1");
-		$this->dbh->execute(array("queued", $token));
+		$this->dbh = $this->db->prepare("SELECT id FROM queue WHERE status='queued' AND token=? LIMIT 1");
+		$this->dbh->execute(array($token));
 
-		if($this->dbh->rowCount() > 0) return true;
-		else return false;
+		return ($this->dbh->rowCount() > 0) ? true : false;
 	}
 
 	/**
@@ -100,7 +99,7 @@ class Queue extends gs
 	 *
 	 * @return int
 	 */
-	private static function getNextQueuePosition()
+	private function getNextQueuePosition()
 	{
 		$this->dbh = $this->db->prepare("SELECT MAX(position) FROM queue");
 		$this->dbh->execute();
