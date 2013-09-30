@@ -73,7 +73,6 @@ $app->post('/player/stream/validate/', function () {
 	echo $player->markSong30Seconds($_POST['streamKey'], $_POST['streamServerID']);
 });
 $app->get('/player/next/', function () {
-	include('config.php');
 	$player = new Player;
 	echo $player->getNextSong();
 });
