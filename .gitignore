@@ -1,2 +1,5 @@
 *.swp
 *.ico
+tmp
+vendor
+composer.lock

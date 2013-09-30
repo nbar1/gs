@@ -101,13 +101,13 @@ class User extends Base
 	 *
 	 * @return bool
 	 */
-	private function getUserByCookie()
+	public function getUserByCookie()
 	{
 		// perform some mild validation on the cookie
-		if(isset($_COOKIE['auth']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['auth']))
+		if(isset($_COOKIE['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['gs_auth']))
 		{
 			$this->dbh = $this->db->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
-			$this->dbh->execute(array($_COOKIE['auth']));
+			$this->dbh->execute(array($_COOKIE['gs_auth']));
 			if($this->dbh->rowCount() > 0)
 			{
 				try
@@ -164,7 +164,7 @@ class User extends Base
 		$this->dbh = $this->db->prepare("INSERT INTO users (nickname, hash, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?)");
 		if($this->dbh->execute(array($nickname, $hash, $created, $created)))
 		{
-			setcookie('auth', $hash, strtotime("+5 years"));
+			setcookie('gs_auth', $hash, strtotime("+5 years"),'/');
 			header('location: '.$_SERVER['PHP_SELF']);
 			return true;
 		}
@@ -213,18 +213,27 @@ class User extends Base
 				$this->setId($user['id'])
 					->setNickname($user['nickname'])
 					->setActiveState($user['active']);
-				return true;
 			}
 			catch (Exception $e) {
 				trigger_error($e->getMessage(), E_USER_ERROR);
 			}
-			setcookie('auth', $hash, strtotime("+5 years"));
+			setcookie('gs_auth', $hash, strtotime("+5 years"), '/');
 			return true;
 			
 		}
 		else {
 			return $this->createUser($nickname);
 		}
+	}
+
+	/**
+	 * Send data to view
+	 *
+	 * return string
+	 */
+	public function renderView()
+	{
+		return $this->templateEngine->draw('register');
 	}
 }
 ?>

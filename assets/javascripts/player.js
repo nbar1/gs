@@ -5,11 +5,8 @@ function playSong(songID) {
 		$('#currentSong .songArtist').html("");
 	} else {
 		$.ajax({
-			url: "songGetter.php",
-			type: "POST",
-			data: {
-				song: songID
-			},
+			url: "/gs/player/stream/"+songID,
+			type: "GET",
 			success: function(response) {
 				console.log(response);
 				var responseData = $.parseJSON(response);
@@ -33,9 +30,8 @@ function playSong(songID) {
 
 function nextSong() {
 	$.ajax({
-		url: "../f.php?f=getNextSong",
-		type: "POST",
-		data: {},
+		url: "/gs/player/next",
+		type: "GET",
 		success: function(response){
 			console.log("nextsong: "+response);
 			playSong(response);
@@ -45,23 +41,20 @@ function nextSong() {
 
 function getSongInfo(songID) {
 	$.ajax({
-		url: "../f.php?f=getSongInfo",
-		type: "POST",
-		data: {
-			song: songID
-		},
+		url: "/gs/song/"+songID,
+		type: "GET",
 		success: function(response){
 			console.log(response);
 			var songInfo = $.parseJSON(response);
-			$('#currentSong .songTitle').html(songInfo.q_song_title);
-			$('#currentSong .songArtist').html(songInfo.q_song_artist);
+			$('#currentSong .songTitle').html(songInfo.title);
+			$('#currentSong .songArtist').html(songInfo.artist);
 		}
 	});
 }
 
 function markSong30Seconds(streamKey, streamServerID) {
 	$.ajax({
-		url: "../f.php?f=markSong30Seconds",
+		url: "/gs/player/stream/validate",
 		type: "POST",
 		data: {
 			streamKey: streamKey,

@@ -59,12 +59,12 @@ class Song extends Base
 	 *
 	 * @param $id [optional] ID of currently queued song
 	 */
-	function __construct($id = null)
+	function __construct($id = null, $tokenAsId = false)
 	{
 		parent::__construct();
 		if ($id !== null)
 		{
-			$this->setId($id);
+			($tokenAsId) ? $this->setToken($id) : $this->setId($id);
 			$this->loadSongInformation();
 		}
 	}
@@ -299,16 +299,18 @@ class Song extends Base
 	 */
 	private function loadSongInformation()
 	{
-		if (isset($this->id))
+		$identifier = (isset($this->id)) ? $this->id : $this->token;
+		if ($identifier)
 		{
-			$this->dbh = $this->db->prepare("SELECT songs.token, songs.title, songs.artist, queue.played_by, queue.promoted_by, queue.priority, queue.position, queue.status FROM songs, queue WHERE queue.id=? GROUP BY token");
-			$this->dbh->execute(array($this->id));
+			$this->dbh = $this->db->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
+			$this->dbh->execute(array($identifier, $identifier));
 			if ($this->dbh->rowCount() > 0)
 			{
 				$song = $this->dbh->fetch(PDO::FETCH_ASSOC);
 				try
 				{
-					$this->setToken($song['token'])
+					$this->setId($song['id'])
+						->setToken($song['token'])
 						->setTitle($song['title'])
 						->setArtist($song['artist'])
 						->setPriority($song['priority'])
@@ -343,18 +345,36 @@ class Song extends Base
 	 * @param string $artist Song artist
 	 * @return bool
 	 */
-	public function setSongInformation($token, $title, $artist)
+	public function setSongInformation($token, $title, $artist, $priority='low')
 	{
 		try
 		{
 			$this->setToken($token)
 				->setTitle($title)
-				->setArtist($artist);
+				->setArtist($artist)
+				->setPriority($priority);
 			return true;
 		}
 		catch (Exception $e) {
 			trigger_error($e->getMessage(), E_USER_ERROR);
 		}
+	}
+
+	/**
+	 * Get Song Information
+	 *
+	 * Get the song information
+	 *
+	 * @return array
+	 */
+	public function getSongInformation()
+	{
+		return array(
+			'id' => $this->getId(),
+			'token' => $this->getToken(),
+			'title' => $this->getTitle(),
+			'artist' => $this->getArtist(),
+		);
 	}
 
 	/**

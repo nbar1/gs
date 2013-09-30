@@ -24,8 +24,7 @@ class Queue extends Base
 	{
 		$this->dbh = $this->db->prepare("SELECT songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE queue.status IN('queued', 'playing') ORDER BY queue.status ASC, queue.priority ASC, queue.position ASC");
 		$this->dbh->execute();
-		$this->dbh->setFetchMode(PDO::FETCH_ASSOC);
-		return $this->dbh->fetchAll();
+		return $this->dbh->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -81,7 +80,7 @@ class Queue extends Base
 	/**
 	 * Is Song In Queue
 	 *
-	 * @param string Token of song
+	 * @param int Token of song
 	 * @return bool
 	 */
 	private function isSongInQueue($token)
@@ -107,6 +106,84 @@ class Queue extends Base
 
 		if(!$songPosition) return 1;
 		else return ++$songPosition;
+	}
+
+	/**
+	 * getNextSong
+	 *
+	 * Returns the information for the next song in the queue
+	 *
+	 * @TODO this may be able to be cleaned up better - break out markSongComplete, markSongPlaying, markSongPlayed, getNextSongId
+	 * @TODO move to Player class
+	 *
+	 * @return array Song information
+	 */
+	public function getNextSong()
+	{
+		$this->dbh = $this->db->prepare("SELECT id, token, status FROM queue WHERE status IN('queued', 'playing') ORDER BY status ASC, priority ASC, position ASC LIMIT 2");
+		$this->dbh->execute();
+		$songs = $this->dbh->fetchAll(PDO::FETCH_ASSOC);
+
+		foreach($songs as $row)
+		{
+			if($row == $songs[0])
+			{
+				if($row['status'] === "playing")
+				{
+					$this->dbh = $this->db->prepare("UPDATE queue SET status=? WHERE id=?");
+					$this->dbh->execute(array("played", $row['id']));
+					continue;
+				}
+				else {
+					$this->dbh = $this->db->prepare("UPDATE queue SET status=? WHERE id=?");
+					$this->dbh->execute(array("playing", $row['id']));
+					return $row['token'];
+				}
+			}
+			else {
+				$this->dbh = $this->db->prepare("UPDATE queue SET status=? WHERE id=?");
+				$this->dbh->execute(array("playing", $row['id']));
+				return $row['token'];
+			}
+		}
+	}
+
+	/**
+	 * Get nickname by ID
+	 *
+	 * @param int User ID
+	 * return string
+	 */
+	public function getNicknameById($id)
+	{
+		$this->dbh = $this->db->prepare("SELECT nickname FROM users WHERE id=? LIMIT 1");
+		$this->dbh->execute(array($id));
+		$row = $this->dbh->fetch(PDO::FETCH_ASSOC);
+		return $row['nickname'];
+	}
+
+	/**
+	 * Send data to view
+	 *
+	 * return string
+	 */
+	public function renderView($view = null)
+	{
+		$user = new User();
+		if($user->getUserByCookie() === true)
+		{
+			$queue = $this->getQueue();
+			for($x=0; $x<sizeof($queue); $x++)
+			{
+				$queue[$x]['played_by_name'] = $this->getNicknameById($queue[$x]['played_by']);
+			}
+			
+			$this->templateEngine->assign("queue", $queue);
+			return $this->templateEngine->draw('queue');
+		}
+		else {
+			return $user->renderView();
+		}
 	}
 }
 ?>
