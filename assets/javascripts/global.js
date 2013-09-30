@@ -113,7 +113,6 @@ gs = {
 	 */
 	addToQueue: function(song, priority) {
 		$.post('/gs/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songPriority:priority}, function(data) {
-		console.log(data);
 			$('.moreopts').slideUp();
 			gs.showModal(data, 2500);
 		});
