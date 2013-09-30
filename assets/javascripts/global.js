@@ -16,7 +16,7 @@ gs = {
 	 */
 	init: function() {
 		gs.bind();
-		$.post('f.php?f=initialize', function(data) {
+		$.ajax({url:'/gs/queue'}).done(function(data) {
 			gs.loadView(data, 'queue');
 			gs.hideLoader();
 		});
@@ -54,7 +54,7 @@ gs = {
 	 */
 	reloadQueue: function() {
 		if(gs.view == 'queue') {
-			$.post('f.php?f=queue', function(data) {
+			$.ajax({url:'/gs/queue'}).done(function(data) {
 				gs.loadView(data, 'queue', 1);
 			});
 		}
@@ -66,7 +66,7 @@ gs = {
 	searchSubmit: function() {
 		$('#search_input').blur();
 		gs.showLoader();
-		$.post('f.php?f=search', { query : $('#search_input').val() }, function(data) {
+		$.ajax({url:'/gs/search/'+$('#search_input').val()}).done(function(data) {
 			gs.loadView(data, 'search');
 			gs.hideLoader();
 		});
@@ -87,7 +87,7 @@ gs = {
 	 */
 	returnToQueue: function() {
 		gs.showLoader();
-		$.post('f.php?f=queue', function(data) {
+		$.ajax({url:'/gs/queue'}).done(function(data) {
 			gs.loadView(data, 'queue');
 			$('#search_input').val("");
 			gs.hideLoader();
@@ -112,7 +112,8 @@ gs = {
 	 * Add selected song to queue
 	 */
 	addToQueue: function(song, priority) {
-		$.post('f.php?f=add', {songID:song[0], songTitle:song[1], songArtist:song[2], songPriority:priority}, function(data) {
+		$.post('/gs/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songPriority:priority}, function(data) {
+		console.log(data);
 			$('.moreopts').slideUp();
 			gs.showModal(data, 2500);
 		});
@@ -122,8 +123,8 @@ gs = {
 	 * Set username
 	 */
 	setUsername: function() {
-		$.post('f.php?f=setname', {set:"true", nickname:$('#setUser_textbox').val() }, function(data) {
-			gs.loadView(data, 'queue');
+		$.post('/gs/user/register', {nickname: $('#setUser_textbox').val()}, function() {
+			location.reload();
 		});
 	},
 
@@ -132,9 +133,10 @@ gs = {
 	 */
 	setUsernameViaKeypress: function(e) {
 		if(e.keyCode==13) {
-			$('#setUser_submit').click();
+			gs.setUsername();
 		}
 	},
+
 	/**
 	 * Show loading modal
 	 */
@@ -148,6 +150,7 @@ gs = {
 	hideLoader: function() {
 		$("#loader").hide();
 	},
+
 	/**
 	 * Show information modal
 	 */
