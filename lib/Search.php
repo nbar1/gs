@@ -32,7 +32,7 @@ class Search extends Base
 	 */
 	public function getSearchResults($query)
 	{
-		$post_url = str_replace(" ", "+", "http://tinysong.com/s/".$query."?format=json&limit=32&key=".$this->tinysong);
+		$post_url = "http://tinysong.com/s/".urlencode($query)."?format=json&limit=32&key=".$this->tinysong;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $post_url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
