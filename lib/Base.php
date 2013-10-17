@@ -13,11 +13,6 @@ class Base
 	public $config;
 
 	/**
-	 * Database object
-	 */
-	public $db;
-
-	/**
 	 * GrooveShark API
 	 */
 	public $gsapi;

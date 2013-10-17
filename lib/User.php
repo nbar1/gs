@@ -23,14 +23,6 @@ class User extends Base
 	private $active;
 
 	/**
-	 * Constructor
-	 */
-	function __construct()
-	{
-		parent::__construct();
-	}
-
-	/**
 	 * Get user id
 	 *
 	 * @return int|null User ID
@@ -103,7 +95,7 @@ class User extends Base
 		// perform some mild validation on the cookie
 		if(isset($_COOKIE['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['gs_auth']))
 		{
-		$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
+			$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
 			$dbh->execute(array($_COOKIE['gs_auth']));
 			if($dbh->rowCount() > 0)
 			{
