@@ -95,17 +95,6 @@ body {
 /**
  * Search
  */
-.moreoptions {
-	height: 0;
-	overflow: hidden;
-	-moz-transition: height 0.5s ease-in-out;
-	-ms-transition: height 0.5s ease-in-out;
-	-webkit-transition: height 0.5s ease-in-out;
-	transition: height 0.5s ease-in-out;
-}
-#song_list.search {
-	margin-bottom: 53px;
-}
 
 
 
@@ -136,21 +125,9 @@ body {
 	width: 45%;
 }
 
-
-
-
-
-
-#addToQueue_options .btn {
-	width: 100%;
-}
-
-
-
-#search_results {
-	font-size: 10px;
-	text-align: center;
-}
+/**
+ * Option Buttons
+ */
 #button_queue {
 	margin: 10px 0;
 	width: 100%;
@@ -163,23 +140,36 @@ body {
 	float: left;
 	width: 50%
 }
-#addToQueue_options {
-	display: none;
-}
-#addToQueue_promote.btn,
-#addToQueue_add.btn {
+.addToQueue {
 	margin: 10px 0;
 	width: 100%;
 }
-#addToQueue_promote.btn {
+.addToQueue_promote {
 	margin-right: 5px;
 }
 
-#addToQueue_add.btn {
+.addToQueue_add {
 	margin-left: 5px;
 }
+.moreoptions {
+	height: 0;
+	overflow: hidden;
+	-moz-transition: height 0.5s ease-in-out;
+	-ms-transition: height 0.5s ease-in-out;
+	-webkit-transition: height 0.5s ease-in-out;
+	transition: height 0.5s ease-in-out;
+}
 
-/* Queue */
+/*
+ * Queue / Search
+ */
+#search_results {
+	font-size: 10px;
+	text-align: center;
+}
+#song_list.search {
+	margin-bottom: 53px;
+}
 #song_list .item_song {
 	background: #efefef;
 	border-bottom: 1px solid #999;
@@ -191,6 +181,11 @@ body {
 	height: auto;
 	min-height: 70px;
 	padding: 15px 0;
+}
+.queue_empty {
+	font-size: 24px;
+	margin-top: 95px;
+	text-align: center;
 }
 .queue .item_song {
 	height: auto;
@@ -239,7 +234,9 @@ body {
 	right: 3%;
 }
 
-/* Username Management */
+/*
+ * Username Management
+ */
 .nickview_row {
 	padding: 10px;
 }
@@ -259,7 +256,9 @@ body {
 	text-align: center;
 }
 
-/* Modal */
+/*
+ * Modal
+ */
 #modal {
 	background: #000;
 	color: #fff;
@@ -267,7 +266,8 @@ body {
 	height: auto;
 	left: 0;
 	opacity: 0;
-	padding: 10px;
+	padding: 0;
+	pointer-events: none;
 	position: fixed;
 	text-align: center;
 	top: 47%;
@@ -278,7 +278,9 @@ body {
 	width: 100%;
 }
 
-/* Clear */
+/*
+ * Clear
+ */
 .clearfloat {
 	clear: both;
 }

@@ -14,7 +14,7 @@ class Search extends Base
 	 *
 	 * Returns an array of search results based on a given query
 	 *
-	 * @param string $query
+	 * @param string $query Search query
 	 * @return array
 	 */
 	public function getSearchResults($query)
@@ -30,7 +30,8 @@ class Search extends Base
 	/**
 	 * Send data to view
 	 *
-	 * return string
+	 * @param string $query Search query
+	 * @return string
 	 */
 	public function renderView($query)
 	{
