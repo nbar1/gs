@@ -30,5 +30,4 @@ spl_autoload_register('autoload');
 
 require_once('vendor/autoload.php');
 require_once('api/gsAPI.php');
-require_once('config.php');
 ?>

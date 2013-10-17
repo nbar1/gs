@@ -37,8 +37,7 @@ class User extends Base
 	 */
 	public function getId()
 	{
-		if ($this->id !== null) return $this->id;
-		return null;
+		return ($this->id !== null) ? $this->id : null;
 	}
 
 	/**
@@ -48,8 +47,7 @@ class User extends Base
 	 */
 	public function getNickname()
 	{
-		if ($this->nickname !== null) return $this->nickname;
-		return null;
+		return ($this->nickname !== null) ? $this->nickname : null;
 	}
 
 	/**
@@ -59,8 +57,7 @@ class User extends Base
 	 */
 	public function isActive()
 	{
-		if ($this->active !== null) return $this->active;
-		return null;
+		return ($this->active !== null) ? $this->active : null;
 	}
 
 	/**
@@ -106,13 +103,13 @@ class User extends Base
 		// perform some mild validation on the cookie
 		if(isset($_COOKIE['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['gs_auth']))
 		{
-			$this->dbh = $this->db->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
-			$this->dbh->execute(array($_COOKIE['gs_auth']));
-			if($this->dbh->rowCount() > 0)
+		$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
+			$dbh->execute(array($_COOKIE['gs_auth']));
+			if($dbh->rowCount() > 0)
 			{
 				try
 				{
-					$user = $this->dbh->fetch();
+					$user = $dbh->fetch();
 					$this->setId($user['id'])
 						->setNickname($user['nickname'])
 						->setActiveState($user['active']);
@@ -139,10 +136,10 @@ class User extends Base
 	public function getAvailablePromotions()
 	{
 		$maxPromotions = 3;
-		$this->dbh = $this->db->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
-		if($this->dbh->execute(array($this->getId())))
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
+		if($dbh->execute(array($this->getId())))
 		{
-			$availablePromotions = $maxPromotions - $this->dbh->rowCount();
+			$availablePromotions = $maxPromotions - $dbh->rowCount();
 			return $availablePromotions;
 		}
 		else {
@@ -161,8 +158,8 @@ class User extends Base
 		if(!$nickname) $nickname = "user".date("His");
 		$created = date('Y-m-d H:i:s');
 		$hash = md5($nickname.$created);
-		$this->dbh = $this->db->prepare("INSERT INTO users (nickname, hash, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?)");
-		if($this->dbh->execute(array($nickname, $hash, $created, $created)))
+		$dbh = $this->getDatabase()->prepare("INSERT INTO users (nickname, hash, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?)");
+		if($dbh->execute(array($nickname, $hash, $created, $created)))
 		{
 			setcookie('gs_auth', $hash, strtotime("+5 years"),'/');
 			header('location: '.$_SERVER['PHP_SELF']);
@@ -182,8 +179,8 @@ class User extends Base
 	 */
 	public function isCurrentUser($nickname)
 	{
-		$this->dbh = $this->db->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
-		if($this->dbh->execute(array($nickname)) && $this->dbh->rowCount() > 0)
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
+		if($dbh->execute(array($nickname)) && $dbh->rowCount() > 0)
 		{
 			return true;
 		}
@@ -204,9 +201,9 @@ class User extends Base
 
 		if($this->isCurrentUser($nickname))
 		{
-			$this->dbh = $this->db->prepare("SELECT id, nickname, ts_created, active FROM users WHERE nickname=?");
-			$this->dbh->execute(array($nickname));
-			$user = $this->dbh->fetch(PDO::FETCH_ASSOC);
+			$dbh = $this->getDatabase()->prepare("SELECT id, nickname, ts_created, active FROM users WHERE nickname=?");
+			$dbh->execute(array($nickname));
+			$user = $dbh->fetch(PDO::FETCH_ASSOC);
 			$hash = md5($user['nickname'].$user['ts_created']);
 			try
 			{
@@ -224,6 +221,20 @@ class User extends Base
 		else {
 			return $this->createUser($nickname);
 		}
+	}
+
+	/**
+	 * Get nickname by ID
+	 *
+	 * @param int User ID
+	 * return string
+	 */
+	public function getNicknameById($id)
+	{
+		$dbh = $this->getDatabase()->prepare("SELECT nickname FROM users WHERE id=? LIMIT 1");
+		$dbh->execute(array($id));
+		$row = $dbh->fetch(PDO::FETCH_ASSOC);
+		return $row['nickname'];
 	}
 
 	/**

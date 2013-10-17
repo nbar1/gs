@@ -8,39 +8,35 @@
 class Player extends Base
 {
 	/**
-	 * Constructor
+	 * Returns the stream info for the flash player
+	 *
+	 * @param int Song token
+	 * @return string JSON encoded stream information
 	 */
-	function __construct()
-	{
-		parent::__construct();
-	}
-	
 	public function getStream($song)
 	{
-		require("config.php");
-		$gsapi = new gsAPI($config['api']['key'], $config['api']['secret']);
-
 		// Session caching
 		if (isset($_SESSION['gsSession']) && !empty($_SESSION['gsSession']))
 		{
-			$gsapi->setSession($_SESSION['gsSession']);
+			$this->getGsAPI()->setSession($_SESSION['gsSession']);
 		}
 		else {
-			$_SESSION['gsSession'] = $gsapi->startSession();
+			$_SESSION['gsSession'] = $this->getGsAPI()->startSession();
 		}
 		
 		// Country caching
 		if (isset($_SESSION['gsCountry']) && !empty($_SESSION['gsCountry']))
 		{
-			$gsapi->setCountry($_SESSION['gsCountry']);
+			$this->getGsAPI()->setCountry($_SESSION['gsCountry']);
 		}
 		else {
-			$_SESSION['gsCountry'] = $gsapi->getCountry();
+			$_SESSION['gsCountry'] = $this->getGsAPI()->getCountry();
 		}
 
-		$gsapi->authenticate($config['grooveshark']['username'], $config['grooveshark']['password']);
+		$this->getGsAPI()->authenticate($this->config['grooveshark']['username'], $this->config['grooveshark']['password']);
+
 		// Make request to Grooveshark and return data as JSON
-		$streamInfo = $gsapi->getSubscriberStreamKey($song, false);
+		$streamInfo = $this->getGsAPI()->getSubscriberStreamKey($song, false);
 		
 		echo json_encode($streamInfo);
 	}
@@ -50,14 +46,13 @@ class Player extends Base
 	 *
 	 * Gets the token of the next song
 	 * 
-	 * @TODO break out setting song status into a seperate method
 	 * @return string Song token
 	 */
 	public function getNextSong()
 	{
-		$this->dbh = $this->db->prepare("SELECT id, token, status FROM queue WHERE status='queued' OR status='playing' ORDER BY status ASC, priority ASC, position ASC LIMIT 2");
-		$this->dbh->execute();
-		$rows = $this->dbh->fetchAll(PDO::FETCH_ASSOC);
+		$dbh = $this->getDatabase()->prepare("SELECT id, token, status FROM queue WHERE status='queued' OR status='playing' ORDER BY status ASC, priority ASC, position ASC LIMIT 2");
+		$dbh->execute();
+		$rows = $dbh->fetchAll(PDO::FETCH_ASSOC);
 		$x=0;
 		foreach($rows as $row)
 		{
@@ -65,22 +60,41 @@ class Player extends Base
 			{
 				if($row['status'] === "playing")
 				{
-					$this->dbh = $this->db->prepare("UPDATE queue SET status='played' WHERE id=?");
-					$this->dbh->execute(array($row['id']));
+					$this->markSongPlayed($row['id']);
 					$x++;
 				}
 				else {
-					$this->dbh = $this->db->prepare("UPDATE queue SET status='playing' WHERE id=?");
-					$this->dbh->execute(array($row['id']));
+					$this->markSongPlaying($row['id']);
 					return $row['token'];
 				}
 			}
 			else {
-				$this->dbh = $this->db->prepare("UPDATE queue SET status='playing' WHERE id=?");
-				$this->dbh->execute(array($row['id']));
+				$this->markSongPlaying($row['id']);
 				return $row['token'];
 			}
 		}
+	}
+
+	/**
+	 * Mark Song Played
+	 *
+	 * @param int song id
+	 */
+	public function markSongPlayed($id)
+	{
+		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='played' WHERE id=?");
+		$dbh->execute(array($id));
+	}
+
+	/**
+	 * Mark Song Playing
+	 *
+	 * @param int song id
+	 */
+	public function markSongPlaying($id)
+	{
+		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='playing' WHERE id=?");
+		$dbh->execute(array($id));
 	}
 
 	/**

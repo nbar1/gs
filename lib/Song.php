@@ -57,7 +57,8 @@ class Song extends Base
 	 *
 	 * If given an ID, it will construct with a currently queued song
 	 *
-	 * @param $id [optional] ID of currently queued song
+	 * @param int|null ID of currently queued song
+	 * @param bool True if token is ID
 	 */
 	function __construct($id = null, $tokenAsId = false)
 	{
@@ -76,8 +77,7 @@ class Song extends Base
 	 */
 	public function getId()
 	{
-		if ($this->id !== null) return $this->id;
-		return null;
+		return ($this->id !== null) ? $this->id : null;
 	}
 
 	/**
@@ -89,8 +89,7 @@ class Song extends Base
 	 */
 	public function getToken()
 	{
-		if ($this->token !== null) return $this->token;
-		return null;
+		return ($this->token !== null) ? $this->token : null;
 	}
 
 	/**
@@ -100,8 +99,7 @@ class Song extends Base
 	 */
 	public function getTitle()
 	{
-		if ($this->title !== null) return $this->title;
-		return null;
+		return ($this->title !== null) ? $this->title : null;
 	}
 
 	/**
@@ -111,8 +109,7 @@ class Song extends Base
 	 */
 	public function getArtist()
 	{
-		if ($this->artist !== null) return $this->artist;
-		return null;
+		return ($this->artist !== null) ? $this->artist : null;
 	}
 
 	/**
@@ -122,8 +119,7 @@ class Song extends Base
 	 */
 	public function getStatus()
 	{
-		if ($this->status !== null) return $this->status;
-		return null;
+		return ($this->status !== null) ? $this->status : null;
 	}
 
 	/**
@@ -133,8 +129,7 @@ class Song extends Base
 	 */
 	public function getPriority()
 	{
-		if ($this->priority !== null) return $this->priority;
-		return "low";
+		return ($this->priority !== null) ? $this->priority : null;
 	}
 
 	/**
@@ -144,8 +139,7 @@ class Song extends Base
 	 */
 	public function getPosition()
 	{
-		if ($this->position !== null) return $this->position;
-		return null;
+		return ($this->position !== null) ? $this->position : null;
 	}
 
 	/**
@@ -155,8 +149,7 @@ class Song extends Base
 	 */
 	public function getPlayedBy()
 	{
-		if ($this->played_by !== null) return $this->played_by;
-		return null;
+		return ($this->played_by !== null) ? $this->played_by : null;
 	}
 
 	/**
@@ -166,8 +159,7 @@ class Song extends Base
 	 */
 	public function getPromotedBy()
 	{
-		if ($this->promoted_by !== null) return $this->promoted_by;
-		return null;
+		return ($this->promoted_by !== null) ? $this->promoted_by : null;
 	}
 
 	/**
@@ -302,11 +294,11 @@ class Song extends Base
 		$identifier = (isset($this->id)) ? $this->id : $this->token;
 		if ($identifier)
 		{
-			$this->dbh = $this->db->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
-			$this->dbh->execute(array($identifier, $identifier));
-			if ($this->dbh->rowCount() > 0)
+			$dbh = $this->getDatabase()->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
+			$dbh->execute(array($identifier, $identifier));
+			if ($dbh->rowCount() > 0)
 			{
-				$song = $this->dbh->fetch(PDO::FETCH_ASSOC);
+				$song = $dbh->fetch(PDO::FETCH_ASSOC);
 				try
 				{
 					$this->setId($song['id'])
@@ -343,6 +335,7 @@ class Song extends Base
 	 * @param string $token Song token for interfaceing with Grooveshark
 	 * @param string $title Song title
 	 * @param string $artist Song artist
+	 * @param string $priority Song priority
 	 * @return bool
 	 */
 	public function setSongInformation($token, $title, $artist, $priority='low')
@@ -386,8 +379,13 @@ class Song extends Base
 	 */
 	public function storeMetadata()
 	{
-		$this->dbh = $this->db->prepare('INSERT INTO songs (token, title, artist) VALUES (?, ?, ?)');
-		return $this->dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist()));
+		$dbh = $this->getDatabase()->prepare('INSERT INTO songs (token, title, artist) VALUES (?, ?, ?)');
+		try {
+			return $dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist()));
+		}
+		catch (Exception $e) {
+			trigger_error($e->getMessage(), E_USER_ERROR);
+		}
 	}
 
 	/**
@@ -399,9 +397,14 @@ class Song extends Base
 	 */
 	public function hasMetadata()
 	{
-		$this->dbh = $this->db->prepare("SELECT id FROM songs WHERE token=? LIMIT 1");
-		$this->dbh->execute(array($this->getToken()));
-		return ($this->dbh->rowCount() > 0) ? true : false;
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM songs WHERE token=? LIMIT 1");
+		try {
+			$dbh->execute(array($this->getToken()));
+			return ($dbh->rowCount() > 0) ? true : false;
+		}
+		catch (Exception $e) {
+			trigger_error($e->getMessage(), E_USER_ERROR);
+		}
 	}
 }
 ?>

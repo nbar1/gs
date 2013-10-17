@@ -1,5 +1,5 @@
 *.swp
 *.ico
+.git
 tmp
 vendor
-composer.lock
