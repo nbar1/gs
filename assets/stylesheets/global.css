@@ -183,6 +183,7 @@ body {
 	padding: 15px 0;
 }
 .queue_empty {
+	color: #777;
 	font-size: 24px;
 	margin-top: 95px;
 	text-align: center;

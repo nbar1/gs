@@ -9,13 +9,13 @@
 			<div class='song_played_by'>{$value.played_by_name}</div>
 	
 			{if="$value.status == 'playing'"}
-			<span class='now_playing_marker label label-info'>now playing</span>
+			<span class='label label-info now_playing_marker'>now playing</span>
 			{elseif="$value.priority == 'high'"}
 			<span class='label label-success high_priority_marker'>promoted</span>
 			{/if}
 		</div>
 	</div>
 	{else}
-	<div class="queue_empty">Queue is empty</div>
+	<div class="queue_empty">no songs</div>
 	{/loop}
 </div>
