@@ -71,8 +71,8 @@ class Queue extends Base
 		if($dbh->execute($data))
 		{
 			if($song->hasMetadata() === false) $song->storeMetadata();
-			
-			if($song->getPriority() === 'high') 
+
+			if($song->getPriority() === 'high')
 			{
 				return 'song promoted';
 			}
@@ -140,14 +140,14 @@ class Queue extends Base
 	 */
 	public function renderView($view = null)
 	{
-		if($this->getUser()->getUserByCookie() === true)
+		if($this->getUser()->getUserByCookie() === true && $this->getUser()->getListeningSession() !== false)
 		{
 			$queue = $this->getQueue();
 			for($x=0; $x<sizeof($queue); $x++)
 			{
 				$queue[$x]['played_by_name'] = $this->getUser()->getNicknameById($queue[$x]['played_by']);
 			}
-			
+
 			$this->templateEngine->assign("queue", $queue);
 			return $this->templateEngine->draw('queue');
 		}

@@ -14,7 +14,7 @@ class Autoplay extends Base
 	 */
 	private function getRecentSongs()
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT DISTINCT songs.artist_id, songs.token FROM queue INNER JOIN songs ON songs.token = queue.token ORDER BY queue.position DESC LIMIT 10");
+		$dbh = $this->getDatabase()->prepare("SELECT DISTINCT songs.artist_id, songs.token FROM queue INNER JOIN songs ON songs.token = queue.token WHERE queue.played_by <> 0 ORDER BY queue.position DESC LIMIT 10");
 		$dbh->execute();
 		return $dbh->fetchAll(PDO::FETCH_ASSOC);
 	}

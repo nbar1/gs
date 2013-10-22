@@ -1,5 +1,8 @@
 *.swp
 *.ico
+<<<<<<< Updated upstream
 .git
 tmp
 vendor
+=======
+>>>>>>> Stashed changes

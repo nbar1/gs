@@ -23,6 +23,11 @@ class Base
 	public $gsapi;
 
 	/**
+	 * Session
+	 */
+	public $session;
+
+	/**
 	 * User
 	 */
 	public $user;
@@ -87,6 +92,20 @@ class Base
 			$this->gsapi = new gsAPI($this->config['api']['key'], $this->config['api']['secret']);
 		}
 		return $this->gsapi;
+	}
+
+	/**
+	 * Returns the Session object
+	 *
+	 * @return Session
+	 */
+	public function getSession()
+	{
+		if (!isset($this->session))
+		{
+			$this->session = new Session();
+		}
+		return $this->session;
 	}
 
 	/**

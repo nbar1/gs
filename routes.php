@@ -56,6 +56,17 @@ $app->get('/search/:query(/:count(/:page))', function ($query, $count=50, $page=
 });
 
 /**
+ * Session
+ */
+$app->post('/session/start/', function () use ($base){
+	$host = $base->getUser()->getIdByNickname($_POST['host']);
+	echo $base->getSession()->startSession($_POST['title'], $host, true, $_POST['coordinates']);
+});
+$app->get('/session/all/', function () use ($base) {
+	var_dump($base->getSession()->getActiveSessions());
+});
+
+/**
  * User
  */
 $app->get('/user/register/', function () use ($base) {

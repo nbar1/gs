@@ -29,8 +29,7 @@ gs = {
 		$('#search_submit').live('click', function() { gs.searchSubmit(); });
 		$('#search_input').bind('keypress', function(e) { gs.searchSubmitViaKeypress(e); });
 		$('#button_queue').live('click', function() { gs.returnToQueue(); });
-		$('.item_song').live('click', function() { gs.selectSong($(this)); });
-		$('.addToQueue_add').live('click', function() { gs.addToQueue(gs.selectedSong, "low"); });
+		$('.item_song').live('click', function() { gs.selectSong($(this)); });		$('.addToQueue_add').live('click', function() { gs.addToQueue(gs.selectedSong, "low"); });
 		$('.addToQueue_promote').live('click', function() { gs.addToQueue(gs.selectedSong, "high"); });
 		$('#setUser_submit').live('click', function() { gs.setUsername(); });
 		$('#setUser_textbox').bind('keypress', function(e) { gs.setUsernameViaKeypress(e); });
@@ -40,7 +39,6 @@ gs = {
 	 * Load given data into a given view
 	 */
 	loadView: function(data, setView, scrollToTop) {
-
 		$('#content_loader').html(data);
 		if(!scrollToTop) {
 			$(window).scrollTop(0);

@@ -233,7 +233,7 @@ class User extends Base
 	 * Get nickname by ID
 	 *
 	 * @param int $id User ID
-	 * return string
+	 * @return string
 	 */
 	public function getNicknameById($id)
 	{
@@ -243,6 +243,36 @@ class User extends Base
 		$dbh->execute(array($id));
 		$row = $dbh->fetch(PDO::FETCH_ASSOC);
 		return $row['nickname'];
+	}
+
+	/**
+	 * Get ID by nickname
+	 *
+	 * @param string $nickname User nickname
+	 * @return int
+	 */
+	public function getIdByNickname($nickname)
+	{
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
+		$dbh->execute(array($nickname));
+		$row = $dbh->fetch(PDO::FETCH_ASSOC);
+		return $row['id'];
+	}
+
+	/**
+	 * Get listening session ID
+	 *
+	 * @return int|bool Session ID
+	 */
+	public function getListeningSession()
+	{
+		
+		$dbh = $this->getDatabase()->prepare("SELECT coordinates FROM users WHERE id=? LIMIT 1");
+		$dbh->execute(array($this->getId()));
+		$row = $dbh->fetch(PDO::FETCH_ASSOC);
+		$coordinates = $row['coordinates'];
+
+		return $this->getSession()->getSessionMatch($coordinates);
 	}
 
 	/**
