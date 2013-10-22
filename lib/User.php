@@ -142,7 +142,7 @@ class User extends Base
 	/**
 	 * Create User
 	 *
-	 * @param string Nickname
+	 * @param string|null $nickname Nickname
 	 * @return bool
 	 */
 	public function createUser($nickname = null)
@@ -167,6 +167,7 @@ class User extends Base
 	 *
 	 * Check if given nickname belongs to a user
 	 *
+	 * @param string $nickname Nickname
 	 * @return bool
 	 */
 	public function isCurrentUser($nickname)
@@ -183,7 +184,7 @@ class User extends Base
 	/**
 	 * Authenticate as given user
 	 *
-	 * @param string Nickname
+	 * @param string|null $nickname Nickname
 	 * @return bool
 	 */
 	public function authenticate($nickname = null)
@@ -216,13 +217,28 @@ class User extends Base
 	}
 
 	/**
+	 * Autoplay User
+	 *
+	 * Creates a user for use with autoplay
+	 *
+	 * @return User
+	 */
+	public function autoplayUser()
+	{
+		$this->setId(0);
+		return $this;
+	}
+
+	/**
 	 * Get nickname by ID
 	 *
-	 * @param int User ID
+	 * @param int $id User ID
 	 * return string
 	 */
 	public function getNicknameById($id)
 	{
+		if($id == 0) return "Autoplayer";
+
 		$dbh = $this->getDatabase()->prepare("SELECT nickname FROM users WHERE id=? LIMIT 1");
 		$dbh->execute(array($id));
 		$row = $dbh->fetch(PDO::FETCH_ASSOC);
@@ -232,7 +248,7 @@ class User extends Base
 	/**
 	 * Send data to view
 	 *
-	 * return string
+	 * @return string
 	 */
 	public function renderView()
 	{

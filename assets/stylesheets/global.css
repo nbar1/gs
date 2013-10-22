@@ -92,16 +92,6 @@ body {
    to {transform: rotate(359deg);}
 }
 
-/**
- * Search
- */
-
-
-
-
-
-
-
 /*
  * Footer
  */
@@ -201,6 +191,12 @@ body {
 	color: #666;
 	font-size: 12px;
 	margin-left: 5px;
+}
+.item_song .song_artist_id {
+	display: none;
+}
+.item_song .song_image {
+	display: none;
 }
 .item_song .song_played_by {
 	color: #666;

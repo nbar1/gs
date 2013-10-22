@@ -964,7 +964,7 @@ class gsAPI {
     /* 
      * Make a call to the Grooveshark API
      */
-    private static function makeCall($method, $args = array(), $resultKey = null, $https = false, $sessionID = false){
+    public static function makeCall($method, $args = array(), $resultKey = null, $https = false, $sessionID = false){
 
         $payload = array('method' => $method,
                          'parameters' => $args,

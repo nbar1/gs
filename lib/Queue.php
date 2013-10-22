@@ -10,7 +10,6 @@ class Queue extends Base
 	/**
 	 * Get Queue
 	 *
-	 * @TODO: might want to rename this method
 	 * @return array Queued songs
 	 */
 	public function getQueue()
@@ -21,10 +20,38 @@ class Queue extends Base
 	}
 
 	/**
+	 * Get Playing Song
+	 *
+	 * @return array|bool Song information
+	 */
+	public function getPlayingSong()
+	{
+		$dbh = $this->getDatabase()->prepare("SELECT id, token FROM queue WHERE status='playing' LIMIT 1");
+		$dbh->execute();
+
+		if($dbh->rowCount() > 1) return false;
+		return $dbh->fetch(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Get Next Song
+	 *
+	 * @return array Song information
+	 */
+	public function getNextSong()
+	{
+		$dbh = $this->getDatabase()->prepare("SELECT id, token FROM queue WHERE status='queued' ORDER BY priority ASC, position ASC LIMIT 1");
+		$dbh->execute();
+
+		if($dbh->rowCount() > 1) return false;
+		return $dbh->fetch(PDO::FETCH_ASSOC);
+	}
+
+	/**
 	 * Add Song To Queue
 	 *
-	 * @param Song Song to be added
-	 * @param User User that added song
+	 * @param Song $song Song to be added
+	 * @param User $user User that added song
 	 * @return string Message sent to user
 	 */
 	public function addSongToQueue(Song $song, User $user)
@@ -44,8 +71,14 @@ class Queue extends Base
 		if($dbh->execute($data))
 		{
 			if($song->hasMetadata() === false) $song->storeMetadata();
-			if($song->getPriority() === 'high') return 'song promoted';
-			else return 'song added';
+			
+			if($song->getPriority() === 'high') 
+			{
+				return 'song promoted';
+			}
+			else {
+				return 'song added';
+			}
 		}
 		else {
 			return 'error adding song';
@@ -55,8 +88,8 @@ class Queue extends Base
 	/**
 	 * Promote Song In Queue
 	 *
-	 * @param Song Song to be promoted
-	 * @param User User that promoted song
+	 * @param Song $song Song to be promoted
+	 * @param User $user User that promoted song
 	 * @return string Message sent to user
 	 */
 	public function promoteSongInQueue(Song $song, User $user)
@@ -72,7 +105,7 @@ class Queue extends Base
 	/**
 	 * Is Song In Queue
 	 *
-	 * @param int Token of song
+	 * @param int $token Token of song
 	 * @return bool
 	 */
 	private function isSongInQueue($token)
@@ -103,7 +136,7 @@ class Queue extends Base
 	/**
 	 * Send data to view
 	 *
-	 * return string
+	 * @return string
 	 */
 	public function renderView($view = null)
 	{

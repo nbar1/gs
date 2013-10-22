@@ -7,7 +7,7 @@ player = {
 	init: function() {
 		player.bind();
 		player.setupPlayer();
-		var t = setTimeout("player.getNextSong()", 2000);
+		var t = setTimeout("player.getNextSong()", 1000);
 	},
 
 	/**

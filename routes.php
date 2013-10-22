@@ -1,32 +1,38 @@
 <?php
+
+/**
+ * Base object
+ */
+$base = new Base();
+
+/**
+ * Paths
+ */
 /**
  * Base
  */
-$app->get('/', function () {
-	$base = new Base;
+$app->get('/', function () use ($base) {
 	echo $base->templateEngine->draw('base', $return_string = false);
 });
 
 /**
  * Queue
  */
-$app->get('/queue/', function () {
-	$queue = new Queue;
-	echo $queue->renderView();
+$app->get('/queue/', function () use ($base) {
+	echo $base->getQueue()->renderView();
 });
 
-$app->post('/queue/add/', function () {
-	$queue = new Queue;
-	$user = new User;
-	$user->authenticate();
-	$song = new Song;
-	$song->setSongInformation($_POST['songID'], $_POST['songTitle'], $_POST['songArtist'], $_REQUEST['songPriority']);
-	echo $queue->addSongToQueue($song, $user);
-});
-
-$app->get('/queue/next/', function () {
-	$queue = new Queue;
-	echo $queue->getNextSong();
+$app->post('/queue/add/', function () use ($base) {
+	$base->getUser()->authenticate();
+	$base->getSong()->setSongInformation(
+		$_POST['songID'],
+		$_POST['songTitle'],
+		$_POST['songArtist'],
+		$_REQUEST['songArtistId'],
+		$_REQUEST['songImage'],
+		$_REQUEST['songPriority']
+	);
+	echo $base->getQueue()->addSongToQueue($base->getSong(), $base->getUser());
 });
 
 /**
@@ -40,41 +46,43 @@ $app->get('/song/:token/', function ($token) {
 /**
  * Search
  */
-$app->get('/search/:query/', function ($query) {
-	$search = new Search;
-	echo $search->renderView(urldecode($query));
+$app->get('/search/artist/:query(/:count)', function ($query, $count=3) {
+	$search = new Search();
+	echo $search->renderView($search->getArtistSearchResults($query, $count));
+});
+$app->get('/search/:query(/:count(/:page))', function ($query, $count=50, $page=1) {
+	$search = new Search();
+	echo $search->renderView($search->getSongSearchResults($query, $count, $page));
 });
 
 /**
  * User
  */
-$app->get('/user/register/', function () {
-	$user = new User;
-	echo $user->renderView();
+$app->get('/user/register/', function () use ($base) {
+	echo $base->getUser()->renderView();
 });
-$app->post('/user/register/', function () {
-	$user = new User;
-	echo $user->authenticate($_POST['nickname']);
+$app->post('/user/register/', function () use ($base){
+	echo $base->getUser()->authenticate($_POST['nickname']);
 });
 
 /**
  * Player
  */
 $app->get('/player/', function () {
-	$player = new Player;
+	$player = new Player();
 	echo $player->renderView();
 });
 $app->get('/player/stream/:token/', function ($token) {
-	$player = new Player;
+	$player = new Player();
 	echo $player->getStream($token);
 });
 $app->post('/player/stream/validate/', function () {
-	$player = new Player;
+	$player = new Player();
 	echo $player->markSong30Seconds($_POST['streamKey'], $_POST['streamServerID']);
 });
 $app->get('/player/next/', function () {
-	$player = new Player;
-	echo $player->getNextSong();
+	$player = new Player();
+	echo $player->playNextSong();
 });
 
 ?>

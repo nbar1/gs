@@ -7,7 +7,7 @@ A party mode playlist that interfaces with GrooveShark
 * Pull in repo
 * Run `composer install`
 * Create a directory in the root called tmp with proper write permissions
-* Install database.sql to your mysql server
+* Import database.sql to your mysql server
 * Update config.php with your specific details
 
 
@@ -21,7 +21,8 @@ You can obtain a GrooveShark API key at [developers.grooveshark.com](http://deve
 One GrooveShark account provisioned with Grooveshark Anywhere is required to stream the songs to the player page.
 You can obtain a GrooveShark Anywhere account at [grooveshark.com](http://grooveshark.com).
 
-## TinySong API
+## GrooveShark API Required Methods
 
-A TinySong API key is required for querying the TinySong database.
-You can obtain a TinySong API key at [tinysong.com](http://tinysong.com).
+Beyond basic GrooveShark Public API v3 access, you should have access to the following methods:
+* startAutoplay
+* getSubscriberStreamKey

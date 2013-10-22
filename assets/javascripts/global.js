@@ -99,7 +99,7 @@ gs = {
 	 */
 	selectSong: function(song) {
 		var moreopts = song.children('.moreoptions');
-		gs.selectedSong = new Array(song.attr('rel'), song.children('div').children('.song_name').html(), song.children('div').children('.song_artist').html());
+		gs.selectedSong = new Array(song.attr('rel'), song.children('div').children('.song_name').html(), song.children('div').children('.song_artist').html(), song.children('div').children('.song_artist_id').html(), song.children('div').children('.song_image').html());
 		$('.moreoptions').css('height', '0');
 		if(moreopts.height() > 1) {
 			moreopts.css('height', '0');
@@ -112,7 +112,8 @@ gs = {
 	 * Add selected song to queue
 	 */
 	addToQueue: function(song, priority) {
-		$.post('/gs/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songPriority:priority}, function(data) {
+		console.log(song);
+		$.post('/gs/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songArtistId:song[3], songImage:song[4], songPriority:priority}, function(data) {
 			$('.moreopts').slideUp();
 			gs.showModal(data, 2500);
 		});

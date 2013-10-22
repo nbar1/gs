@@ -28,6 +28,16 @@ class Song extends Base
 	private $artist;
 
 	/**
+	 * Song artist id
+	 */
+	private $artist_id;
+
+	/**
+	 * Song image
+	 */
+	private $image;
+
+	/**
 	 * Song status
 	 */
 	private $status;
@@ -57,8 +67,8 @@ class Song extends Base
 	 *
 	 * If given an ID, it will construct with a currently queued song
 	 *
-	 * @param int|null ID of currently queued song
-	 * @param bool True if token is ID
+	 * @param int|null $id ID of currently queued song
+	 * @param bool $tokenAsId Builds a song with a token instead of an ID
 	 */
 	function __construct($id = null, $tokenAsId = false)
 	{
@@ -110,6 +120,26 @@ class Song extends Base
 	public function getArtist()
 	{
 		return ($this->artist !== null) ? $this->artist : null;
+	}
+
+	/**
+	 * Get song artist id
+	 *
+	 * @return string|null Song Artist ID
+	 */
+	public function getArtistId()
+	{
+		return ($this->artist_id !== null) ? $this->artist_id : null;
+	}
+
+	/**
+	 * Get song image
+	 *
+	 * @return string|null Song Image URL
+	 */
+	public function getImage()
+	{
+		return ($this->image !== null) ? $this->image : null;
 	}
 
 	/**
@@ -165,6 +195,7 @@ class Song extends Base
 	/**
 	 * Set song id
 	 *
+	 * @param int $id Song ID
 	 * @return Song $this
 	 */
 	public function setId($id)
@@ -178,6 +209,7 @@ class Song extends Base
 	 *
 	 * Token is used for interfacing with GrooveShark
 	 *
+	 * @param int $token Song token
 	 * @return Song $this
 	 */
 	public function setToken($token)
@@ -189,6 +221,7 @@ class Song extends Base
 	/**
 	 * Set song title
 	 *
+	 * @param strubg $tutke Song title
 	 * @return Song $this
 	 */
 	public function setTitle($title)
@@ -200,6 +233,7 @@ class Song extends Base
 	/**
 	 * Set song artist
 	 *
+	 * @param string $artist Artist name
 	 * @return Song $this
 	 */
 	public function setArtist($artist)
@@ -209,8 +243,33 @@ class Song extends Base
 	}
 
 	/**
+	 * Set song artist id
+	 *
+	 * @param int $artist_id Artist ID
+	 * @return Song $this
+	 */
+	public function setArtistId($artist_id)
+	{
+		$this->artist_id = $artist_id;
+		return $this;
+	}
+
+	/**
+	 * Set song image
+	 *
+	 * @param string $image Image filename
+	 * @return Song $this
+	 */
+	public function setImage($image)
+	{
+		$this->image = $image;
+		return $this;
+	}
+
+	/**
 	 * Set song status
 	 *
+	 * @param string $status Status of song
 	 * @return Song $this
 	 */
 	public function setStatus($status)
@@ -233,6 +292,7 @@ class Song extends Base
 	/**
 	 * Set song priority
 	 *
+	 * @param string $priority Song priority
 	 * @return Song $this
 	 */
 	public function setPriority($priority)
@@ -252,6 +312,7 @@ class Song extends Base
 	/**
 	 * Set song position
 	 *
+	 * @param int $position Queue position
 	 * @return Song $this
 	 */
 	public function setPosition($position)
@@ -263,6 +324,7 @@ class Song extends Base
 	/**
 	 * Set song played by
 	 *
+	 * @param int $userid User who played song
 	 * @return Song $this
 	 */
 	public function setPlayedBy($userid)
@@ -274,6 +336,7 @@ class Song extends Base
 	/**
 	 * Set song promoted by
 	 *
+	 * @param int $userid User who promoted song
 	 * @return Song $this
 	 */
 	public function setPromotedBy($userid)
@@ -287,14 +350,14 @@ class Song extends Base
 	 *
 	 * Loads information from the database about the song currenly designated by $id
 	 *
-	 * return bool
+	 * @return bool
 	 */
 	private function loadSongInformation()
 	{
 		$identifier = (isset($this->id)) ? $this->id : $this->token;
 		if ($identifier)
 		{
-			$dbh = $this->getDatabase()->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
+			$dbh = $this->getDatabase()->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, songs.artist_id, songs.image, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
 			$dbh->execute(array($identifier, $identifier));
 			if ($dbh->rowCount() > 0)
 			{
@@ -305,6 +368,8 @@ class Song extends Base
 						->setToken($song['token'])
 						->setTitle($song['title'])
 						->setArtist($song['artist'])
+						->setArtistId($song['artist_id'])
+						->setImage($song['image'])
 						->setPriority($song['priority'])
 						->setPosition($song['position'])
 						->setPlayedBy($song['played_by'])
@@ -335,16 +400,19 @@ class Song extends Base
 	 * @param string $token Song token for interfaceing with Grooveshark
 	 * @param string $title Song title
 	 * @param string $artist Song artist
+	 * @param string $artist_id Song artist id
 	 * @param string $priority Song priority
 	 * @return bool
 	 */
-	public function setSongInformation($token, $title, $artist, $priority='low')
+	public function setSongInformation($token, $title, $artist, $artist_id, $image, $priority='low')
 	{
 		try
 		{
 			$this->setToken($token)
 				->setTitle($title)
 				->setArtist($artist)
+				->setArtistId($artist_id)
+				->setImage($image)
 				->setPriority($priority);
 			return true;
 		}
@@ -367,6 +435,8 @@ class Song extends Base
 			'token' => $this->getToken(),
 			'title' => $this->getTitle(),
 			'artist' => $this->getArtist(),
+			'artist_id' => $this->getArtistId(),
+			'image' => $this->getImage(),
 		);
 	}
 
@@ -379,9 +449,9 @@ class Song extends Base
 	 */
 	public function storeMetadata()
 	{
-		$dbh = $this->getDatabase()->prepare('INSERT INTO songs (token, title, artist) VALUES (?, ?, ?)');
+		$dbh = $this->getDatabase()->prepare('INSERT INTO songs (token, title, artist, artist_id, image) VALUES (?, ?, ?, ?, ?)');
 		try {
-			return $dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist()));
+			return $dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist(), $this->getArtistId(), $this->getImage()));
 		}
 		catch (Exception $e) {
 			trigger_error($e->getMessage(), E_USER_ERROR);

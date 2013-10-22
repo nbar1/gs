@@ -3,8 +3,6 @@
  * Search
  *
  * Controls the TinySong API for query searching
- *
- * @TODO: Use the GrooveShark API for searching instead of TinySong
  */
 
 class Search extends Base
@@ -12,8 +10,11 @@ class Search extends Base
 	/**
 	 * getSearchResults
 	 *
+	 * Legacy Function
+	 *
 	 * Returns an array of search results based on a given query
 	 *
+	 * @TODO: REMOVE LEGACY CODE
 	 * @param string $query Search query
 	 * @return array
 	 */
@@ -28,15 +29,43 @@ class Search extends Base
 	}
 
 	/**
-	 * Send data to view
+	 * Get Artist Search Results
+	 *
+	 * Returns an array of artist search results based on a given query
 	 *
 	 * @param string $query Search query
+	 * @param int $count Number of results to return
+	 * @return array
+	 */
+	public function getArtistSearchResults($query, $count=3)
+	{
+		$this->authenticateToGrooveShark();
+		return $this->getGsAPI()->getArtistSearchResults($query, $count);
+	}
+
+	/**
+	 * Get Song Search Results
+	 *
+	 * Returns an array of song search results based on a given query
+	 *
+	 * @param string $query Search query
+	 * @param int $count Number of results to return
+	 * @return array
+	 */
+	public function getSongSearchResults($query, $count=30, $page=1)
+	{
+		$this->authenticateToGrooveShark();
+		return $this->getGsAPI()->getSongSearchResults($query, null, $count, $page);
+	}
+
+	/**
+	 * Send data to view
+	 *
+	 * @param string $query Search results
 	 * @return string
 	 */
-	public function renderView($query)
+	public function renderView($results)
 	{
-		$results = $this->getSearchResults($query);
-
 		$this->templateEngine->assign('results', $results);
 		return $this->templateEngine->draw('search');
 	}
