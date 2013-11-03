@@ -16,7 +16,7 @@ gs = {
 	 */
 	init: function() {
 		gs.bind();
-		$.ajax({url:'/gs/queue'}).done(function(data) {
+		$.ajax({url:'/queue'}).done(function(data) {
 			gs.loadView(data, 'queue');
 			gs.hideLoader();
 		});
@@ -54,7 +54,7 @@ gs = {
 	 */
 	reloadQueue: function() {
 		if(gs.view == 'queue') {
-			$.ajax({url:'/gs/queue'}).done(function(data) {
+			$.ajax({url:'/queue'}).done(function(data) {
 				gs.loadView(data, 'queue', 1);
 			});
 		}
@@ -66,7 +66,7 @@ gs = {
 	searchSubmit: function() {
 		$('#search_input').blur();
 		gs.showLoader();
-		$.ajax({url:'/gs/search/'+$('#search_input').val()}).done(function(data) {
+		$.ajax({url:'/search/'+$('#search_input').val()}).done(function(data) {
 			gs.loadView(data, 'search');
 			gs.hideLoader();
 		});
@@ -87,7 +87,7 @@ gs = {
 	 */
 	returnToQueue: function() {
 		gs.showLoader();
-		$.ajax({url:'/gs/queue'}).done(function(data) {
+		$.ajax({url:'/queue'}).done(function(data) {
 			gs.loadView(data, 'queue');
 			$('#search_input').val("");
 			gs.hideLoader();
@@ -113,7 +113,7 @@ gs = {
 	 */
 	addToQueue: function(song, priority) {
 		console.log(song);
-		$.post('/gs/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songArtistId:song[3], songImage:song[4], songPriority:priority}, function(data) {
+		$.post('/queue/add', {songID:song[0], songTitle:song[1], songArtist:song[2], songArtistId:song[3], songImage:song[4], songPriority:priority}, function(data) {
 			$('.moreopts').slideUp();
 			gs.showModal(data, 2500);
 		});
@@ -123,7 +123,7 @@ gs = {
 	 * Set username
 	 */
 	setUsername: function() {
-		$.post('/gs/user/register', {nickname: $('#setUser_textbox').val()}, function() {
+		$.post('/user/register', {nickname: $('#setUser_textbox').val()}, function() {
 			location.reload();
 		});
 	},
