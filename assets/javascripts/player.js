@@ -38,12 +38,18 @@ player = {
 	 */
 	getSongInfo: function(token) {
 		$.ajax({
-			url: "/gs/song/"+token,
+			url: "/song/"+token,
 			type: "GET",
 			success: function(response){
+				console.log(response);
 				var songInfo = $.parseJSON(response);
 				$('#currentSong .songTitle').html(songInfo.title);
 				$('#currentSong .songArtist').html(songInfo.artist);
+				if(songInfo.image != null && songInfo.image != 'default.jpg') {
+					$('body').css('background-image', 'url(http://images.gs-cdn.net/static/albums/500_'+songInfo.image+')');
+				} else {
+					$('body').css('background-image', '');
+				}
 			}
 		});
 	},
@@ -53,7 +59,7 @@ player = {
 	 */
 	getNextSong: function() {
 		$.ajax({
-			url: "/gs/player/next",
+			url: "/player/next",
 			type: "GET",
 			success: function(response){
 				player.playSong(response);
@@ -66,7 +72,7 @@ player = {
 	 */
 	getNextSong: function() {
 		$.ajax({
-			url: "/gs/player/next",
+			url: "/player/next",
 			type: "GET",
 			success: function(response){
 				player.playSong(response);
@@ -79,7 +85,7 @@ player = {
 	 */
 	markSong30Seconds: function(streamKey, streamServerID) {
 		$.ajax({
-			url: "/gs/player/stream/validate",
+			url: "/player/stream/validate",
 			type: "POST",
 			data: {
 				streamKey: streamKey,
@@ -98,7 +104,7 @@ player = {
 			$('#currentSong .songArtist').html("");
 		} else {
 			$.ajax({
-				url: "/gs/player/stream/"+token,
+				url: "/player/stream/"+token,
 				type: "GET",
 				success: function(response) {
 					var responseData = $.parseJSON(response);
@@ -107,7 +113,7 @@ player = {
 					var streamServerID = responseData.StreamServerID;
 					var streamTime = responseData.uSecs / 1000 - 0; // - seconds of lag, 0 seems to work fine
 					player.getSongInfo(token);
-					var t = setTimeout("player.markSong30Seconds('"+streamKey+"', "+streamServerID+")", 45000);
+					//var t = setTimeout("player.markSong30Seconds('"+streamKey+"', "+streamServerID+")", 45000);
 					var t = setTimeout("player.getNextSong()", streamTime);
 				},
 				error: function() {

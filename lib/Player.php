@@ -65,8 +65,7 @@ class Player extends Base
 	 */
 	public function markSongPlayed($id)
 	{
-		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='played' WHERE id=?");
-		$dbh->execute(array($id));
+		$this->getDao()->markSongPlayed($id);
 	}
 
 	/**
@@ -76,8 +75,7 @@ class Player extends Base
 	 */
 	public function markSongPlaying($id)
 	{
-		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='playing' WHERE id=?");
-		$dbh->execute(array($id));
+		$this->getDao()->markSongPlaying($id);
 	}
 
 	/**

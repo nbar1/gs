@@ -354,14 +354,13 @@ class Song extends Base
 	 */
 	private function loadSongInformation()
 	{
+		xdebug_break();
 		$identifier = (isset($this->id)) ? $this->id : $this->token;
 		if ($identifier)
 		{
-			$dbh = $this->getDatabase()->prepare("SELECT songs.id, songs.token, songs.title, songs.artist, songs.artist_id, songs.image, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE songs.id=? OR songs.token=? ORDER BY queue.position DESC LIMIT 1");
-			$dbh->execute(array($identifier, $identifier));
-			if ($dbh->rowCount() > 0)
+			$song = $this->getDao()->getSongInformation($identifier);
+			if ($song && sizeof($song) > 0)
 			{
-				$song = $dbh->fetch(PDO::FETCH_ASSOC);
 				try
 				{
 					$this->setId($song['id'])
@@ -426,7 +425,7 @@ class Song extends Base
 	 *
 	 * Get the song information
 	 *
-	 * @return array
+	 * @return array Song information
 	 */
 	public function getSongInformation()
 	{
@@ -445,17 +444,12 @@ class Song extends Base
 	 *
 	 * Store song metadata in database
 	 *
-	 * @return bool
+	 * @return bool Status
 	 */
 	public function storeMetadata()
 	{
-		$dbh = $this->getDatabase()->prepare('INSERT INTO songs (token, title, artist, artist_id, image) VALUES (?, ?, ?, ?, ?)');
-		try {
-			return $dbh->execute(array($this->getToken(), $this->getTitle(), $this->getArtist(), $this->getArtistId(), $this->getImage()));
-		}
-		catch (Exception $e) {
-			trigger_error($e->getMessage(), E_USER_ERROR);
-		}
+		xdebug_break();
+		return $this->getDao()->storeSongMetadata(array($this->getToken(), $this->getTitle(), $this->getArtist(), $this->getArtistId(), $this->getImage()));
 	}
 
 	/**
@@ -463,18 +457,11 @@ class Song extends Base
 	 *
 	 * Check the database to see if the song has metadata stored
 	 *
-	 * @return bool
+	 * @return bool Song has metadata
 	 */
 	public function hasMetadata()
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM songs WHERE token=? LIMIT 1");
-		try {
-			$dbh->execute(array($this->getToken()));
-			return ($dbh->rowCount() > 0) ? true : false;
-		}
-		catch (Exception $e) {
-			trigger_error($e->getMessage(), E_USER_ERROR);
-		}
+		return $this->getDao()->songHasMetadata($this->getToken());
 	}
 }
 ?>
