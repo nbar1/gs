@@ -6,16 +6,15 @@
  */
 class Base
 {
-
 	/**
 	 * Config
 	 */
 	public $config;
 
 	/**
-	 * Database
+	 * Data access object
 	 */
-	public $db;
+	private $dao;
 
 	/**
 	 * GrooveShark API
@@ -65,19 +64,17 @@ class Base
 	}
 
 	/**
-	 * Get database object
+	 * Get data access object
 	 *
-	 * @return PDO Database object
+	 * @return Dao Data access object
 	 */
-	public function getDatabase()
+	public function getDao()
 	{
-		if(!isset($this->db))
+		if(!isset($this->dao))
 		{
-			$db = new PDO("mysql:host={$this->config['database']['host']};dbname={$this->config['database']['db_name']}", $this->config['database']['user'], $this->config['database']['password']);
-			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			return $db;
+			$this->dao = new Dao();
 		}
-		return $this->db;
+		return $this->dao;
 	}
 
 	/**
@@ -201,6 +198,23 @@ class Base
 			"tpl_ext"	=> "phtml",
 		);
 		$this->templateEngine->configure($config);
+	}
+
+	/**
+	 * Returns a helper class
+	 *
+	 * @param string $helper The name of the helper class
+	 * @return Helper class
+	 */
+	protected function getHelper($helper)
+	{
+		$helper = 'Helper_'.ucfirst($helper);
+		if(!isset($this->$$helper) && class_exists($helper))
+		{
+			$this->$$helper = new $helper;
+			return $this->$$helper;
+		}
+		return $this->$$helper;
 	}
 }
 ?>

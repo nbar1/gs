@@ -31,6 +31,7 @@ body {
 }
 .navbar #search_submit {
 	border-left: none;
+	outline: 0;
 }
 
 /**
@@ -160,17 +161,28 @@ body {
 #song_list.search {
 	margin-bottom: 53px;
 }
-#song_list .item_song {
-	background: #efefef;
-	border-bottom: 1px solid #999;
-}
-#song_list .item_song.selected {
+#song_list .item_listitem.selected {
 	background: #ddd;
 }
-.item_song {
+.item_listitem {
+	background: #efefef;
+	border-bottom: 1px solid #999;
 	height: auto;
 	min-height: 70px;
 	padding: 15px 0;
+}
+.item_artist {
+
+}
+.item_category {
+	background: #ddd;
+	font-size: 26px;
+	min-height: 0;
+	padding: 5px 0;
+	text-align: center;
+}
+.item_song {
+
 }
 .queue_empty {
 	color: #777;
@@ -178,8 +190,17 @@ body {
 	margin-top: 95px;
 	text-align: center;
 }
-.queue .item_song {
+.queue .item_listitem {
 	height: auto;
+}
+.item_artist .artist_name {
+	font-size: 20px;
+	line-height: 39px;
+	overflow: hidden;
+	width: 100%;
+}
+.item_artist .artist_id {
+	display: none;
 }
 .item_song .song_name {
 	font-size: 16px;
@@ -238,20 +259,35 @@ body {
 	padding: 10px;
 }
 .setUser_header {
+	color: #4b4b4b;
 	font-size: 24px;
 	margin-top: 30px;
 	text-align: center;
 }
-.setUser_textbox,
-.setUser_textbox input {
+.setUser_header:nth-child(1) {
+	margin-top: 0;
+}
+.setUser_textbox {
 	text-align: center;
+}
+.setUser_textbox input {
+	border: 1px solid #ccc;
+	text-align: center;
+	width: 260px;
 }
 .nickview_submit {
 	text-align: center;
 }
 #setUser_submit {
+	color: #4b4b4b;
 	text-align: center;
+	width: 260px;
 }
+
+.session_setter {
+	width: 260px;
+}
+
 
 /*
  * Modal

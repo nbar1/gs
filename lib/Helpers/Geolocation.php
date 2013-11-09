@@ -1,13 +1,13 @@
 <?php
 /**
- * GeoLocation
+ * Helpers_GeoLocation
  *
  * http://stackoverflow.com/questions/10053358/measuring-the-distance-between-two-coordinates-in-php
  *
  * Processes location information to decide which session to join
  */
 
-class GeoLocation
+class Helpers_GeoLocation
 {
 	/**
 	 * Calculates the great-circle distance between two points, with the Vincenty formula.
@@ -42,13 +42,18 @@ class GeoLocation
 	 */
 	public static function getLocationMatch($coordinates, $sessions, $radius = 150)
 	{
-		$coordinates = GeoLocation::parseCoordinates($coordinates);
+		$coordinates = Helpers_Geolocation::parseCoordinates($coordinates);
 		foreach($sessions as $session)
 		{
-			$session_coordinates = GeoLocation::parseCoordinates($session['coordinates']);
-			if(GeoLocation::vincentyGreatCircleDistance($coordinates['latitude'], $coordinates['longitude'], $session_coordinates['latitude'], $session_coordinates['longitude']) <= $radius)
+			$session_coordinates = Helpers_Geolocation::parseCoordinates($session['coordinates']);
+			if(Helpers_Geolocation::vincentyGreatCircleDistance($coordinates['latitude'], $coordinates['longitude'], $session_coordinates['latitude'], $session_coordinates['longitude']) <= $radius)
 			{
-				return $session['id'];
+				return array(
+					'id' => $session['id'],
+					'title' => $session['title'],
+					'host' => $session['host'],
+					'coordinates' => $session['coordinates'],
+				);
 			}
 		}
 		return false;

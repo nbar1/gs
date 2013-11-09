@@ -42,28 +42,45 @@ class Session extends Base
 	 * @param bool $locationBased Location based session
 	 * @param string|null $coordinates Coordinates of session host
 	 */
-	public function startSession($title, $host, $locationBased = true, $coordinates = null)
+	public function startSession($title, $host, $location_based=true, $latitude=null, $longitude=null)
 	{
 		$this->title = $title;
 		$this->host = $host;
 		$this->coordinates = $coordinates;
-		
-		if($this->getSessionMatch($coordinates) === false)
+
+		if ($location_based && $this->matchSessionToCoordinates($coordinates) != false)
 		{
-			$dbh = $this->getDatabase()->prepare("INSERT INTO sessions (title, host, location_based, coordinates, started) VALUES (?, ?, ?, ?, NOW())");
-			$dbh->execute(array($title, $host, $locationBased, $coordinates));
+			// bomb because a session is already available here
 		}
+		else {
+			// we can create a session that is location based
+			$this->getDao()->storeNewSessionData(array($title, $host, $locationBased, $latitude.",".$longitude));
+		}
+	}
+
+	/**
+	 * Set session
+	 *
+	 * @param int $session_id Session ID
+	 * @return true
+	 */
+	public function setSession($session_id)
+	{
+		$_SESSION['listening_session_id'] = $session_id;
+		return true;
 	}
 
 	/**
 	 * Get session match based on coordinates
 	 *
-	 * @param string $coordinates lat,long
+	 * @param int $latitude
+	 * @param int $longitude
 	 * @return int|bool Session ID
 	 */
-	public function getSessionMatch($coordinates)
+	public function matchSessionToCoordinates($latitude, $longitude)
 	{
-		return GeoLocation::getLocationMatch($coordinates, $this->getActiveSessions());
+		$coordinates = $latitude.",".$longitude;
+		return Helpers_Geolocation::getLocationMatch($coordinates, $this->getActiveSessions());
 	}
 
 	/**
@@ -73,9 +90,6 @@ class Session extends Base
 	 */
 	public function getActiveSessions()
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id, title, host, location_based, coordinates FROM sessions WHERE active = 1 AND started > timestampadd(hour, -24, now())");
-		$dbh->execute();
-
-		return $dbh->fetchAll(PDO::FETCH_ASSOC);
+		return $this->getDao()->getActiveSessions();
 	}
 }

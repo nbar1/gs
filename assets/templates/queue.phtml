@@ -1,7 +1,7 @@
 <script>var t=setTimeout("gs.reloadQueue()", 15000);</script>
 <div id='song_list' class='queue'>
 	{loop="$queue"}
-	<div class='row-fluid item_song {$value.priority} {$value.status} {$value.token}' onclick=''>
+	<div class='row-fluid item_song item_listitem {$value.priority} {$value.status} {$value.token}' onclick=''>
 		<div class='col-lg-12'>
 			<div class='item_status'></div>
 			<div class='song_name'>{$value.title}</div>

@@ -86,38 +86,22 @@ class User extends Base
 	}
 
 	/**
-	 * Get user information from cookie
+	 * Get user information from session
 	 *
 	 * @return bool
 	 */
-	public function getUserByCookie()
+	public function getUserBySession()
 	{
-		// perform some mild validation on the cookie
-		if(isset($_COOKIE['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['gs_auth']))
+		// perform some mild validation on the session id
+		if(isset($_SESSION['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_SESSION['gs_auth']) && $this->getDao()->getUserExistsByHash($_SESSION['gs_auth']))
 		{
-			$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active FROM users WHERE hash=? LIMIT 1");
-			$dbh->execute(array($_COOKIE['gs_auth']));
-			if($dbh->rowCount() > 0)
-			{
-				try
-				{
-					$user = $dbh->fetch();
-					$this->setId($user['id'])
-						->setNickname($user['nickname'])
-						->setActiveState($user['active']);
-					return true;
-				}
-				catch (Exception $e) {
-					trigger_error($e->getMessage(), E_USER_ERROR);
-				}
-			}
-			else {
-				throw new Exception("No user matching given hash");
-			}
+			$user = $this->getDao()->getUserInformationByHash($_SESSION['gs_auth']);
+			$this->setId($user['id'])
+				->setNickname($user['nickname'])
+				->setActiveState($user['active']);
+			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 	/**
@@ -127,16 +111,9 @@ class User extends Base
 	 */
 	public function getAvailablePromotions()
 	{
-		$maxPromotions = 3;
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
-		if($dbh->execute(array($this->getId())))
-		{
-			$availablePromotions = $maxPromotions - $dbh->rowCount();
-			return $availablePromotions;
-		}
-		else {
-			return 0;
-		}
+		$max_promotions = 3;
+		$available_promotions = $max_promotions - $this->getDao()->getRecentPromotionCount($this->getId());
+		return ($available_promotions > 0) ? $available_promotions : 0;
 	}
 
 	/**
@@ -150,35 +127,16 @@ class User extends Base
 		if(!$nickname) $nickname = "user".date("His");
 		$created = date('Y-m-d H:i:s');
 		$hash = md5($nickname.$created);
-		$dbh = $this->getDatabase()->prepare("INSERT INTO users (nickname, hash, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?)");
-		if($dbh->execute(array($nickname, $hash, $created, $created)))
+
+		if($this->getDao()->createUser(array($nickname, $hash, $created, $created)))
 		{
-			setcookie('gs_auth', $hash, strtotime("+5 years"),'/');
+			$_SESSION['gs_auth'] = $hash;
 			header('location: '.$_SERVER['PHP_SELF']);
 			return true;
 		}
 		else {
 			return false;
 		}
-	}
-
-	/**
-	 * Is Valid User
-	 *
-	 * Check if given nickname belongs to a user
-	 *
-	 * @param string $nickname Nickname
-	 * @return bool
-	 */
-	public function isCurrentUser($nickname)
-	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
-		if($dbh->execute(array($nickname)) && $dbh->rowCount() > 0)
-		{
-			return true;
-		}
-		return false;
-		
 	}
 
 	/**
@@ -189,25 +147,17 @@ class User extends Base
 	 */
 	public function authenticate($nickname = null)
 	{
-		if($nickname === null && $this->getUserByCookie()) $nickname = $this->getNickname();
+		if($nickname === null && $this->getUserBySession()) $nickname = $this->getNickname();
 		if(strlen($nickname) > 32) $nickname = substr($nickname, 0, 32);
 
-		if($this->isCurrentUser($nickname))
+		if($this->getDao()->getUserExistsByNickname($nickname))
 		{
-			$dbh = $this->getDatabase()->prepare("SELECT id, nickname, ts_created, active FROM users WHERE nickname=?");
-			$dbh->execute(array($nickname));
-			$user = $dbh->fetch(PDO::FETCH_ASSOC);
+			$user = $this->getDao()->getUserInformationByNickname($nickname);
 			$hash = md5($user['nickname'].$user['ts_created']);
-			try
-			{
-				$this->setId($user['id'])
-					->setNickname($user['nickname'])
-					->setActiveState($user['active']);
-			}
-			catch (Exception $e) {
-				trigger_error($e->getMessage(), E_USER_ERROR);
-			}
-			setcookie('gs_auth', $hash, strtotime("+5 years"), '/');
+			$this->setId($user['id'])
+				->setNickname($user['nickname'])
+				->setActiveState($user['active']);
+			$_SESSION['gs_auth'] = $hash;
 			return true;
 			
 		}
@@ -239,10 +189,8 @@ class User extends Base
 	{
 		if($id == 0) return "Autoplayer";
 
-		$dbh = $this->getDatabase()->prepare("SELECT nickname FROM users WHERE id=? LIMIT 1");
-		$dbh->execute(array($id));
-		$row = $dbh->fetch(PDO::FETCH_ASSOC);
-		return $row['nickname'];
+		$user = $this->getDao()->getUserInformationById($id);
+		return $user['nickname'];
 	}
 
 	/**
@@ -253,26 +201,8 @@ class User extends Base
 	 */
 	public function getIdByNickname($nickname)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
-		$dbh->execute(array($nickname));
-		$row = $dbh->fetch(PDO::FETCH_ASSOC);
-		return $row['id'];
-	}
-
-	/**
-	 * Get listening session ID
-	 *
-	 * @return int|bool Session ID
-	 */
-	public function getListeningSession()
-	{
-		
-		$dbh = $this->getDatabase()->prepare("SELECT coordinates FROM users WHERE id=? LIMIT 1");
-		$dbh->execute(array($this->getId()));
-		$row = $dbh->fetch(PDO::FETCH_ASSOC);
-		$coordinates = $row['coordinates'];
-
-		return $this->getSession()->getSessionMatch($coordinates);
+		$user = $this->getDao()->getUserInformationByNickname($nickname);
+		return $user['id'];
 	}
 
 	/**
@@ -282,7 +212,7 @@ class User extends Base
 	 */
 	public function renderView()
 	{
-		return $this->templateEngine->draw('register');
+		return $this->templateEngine->draw('login');
 	}
 }
 ?>
