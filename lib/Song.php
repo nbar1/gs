@@ -354,7 +354,6 @@ class Song extends Base
 	 */
 	private function loadSongInformation()
 	{
-		xdebug_break();
 		$identifier = (isset($this->id)) ? $this->id : $this->token;
 		if ($identifier)
 		{
@@ -448,7 +447,6 @@ class Song extends Base
 	 */
 	public function storeMetadata()
 	{
-		xdebug_break();
 		return $this->getDao()->storeSongMetadata(array($this->getToken(), $this->getTitle(), $this->getArtist(), $this->getArtistId(), $this->getImage()));
 	}
 

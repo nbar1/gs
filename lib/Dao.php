@@ -181,7 +181,6 @@ class Dao extends Base
 	 */
 	public function storeSongMetadata($song)
 	{
-		xdebug_break();
 		$dbh = $this->getDatabase()->prepare('INSERT INTO songs (token, title, artist, artist_id, image) VALUES (?, ?, ?, ?, ?)');
 		return $dbh->execute($song);
 	}

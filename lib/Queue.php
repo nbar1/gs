@@ -60,7 +60,6 @@ class Queue extends Base
 		if($this->getDao()->addSongToQueue($data))
 		{
 			$song_has_metadata = $song->hasMetadata();
-			xdebug_break();
 			if(!$song_has_metadata) $song->storeMetadata();
 
 			if($song->getPriority() === 'high')

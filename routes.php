@@ -68,7 +68,6 @@ $app->get('/search/artist/:artist_id', function ($artist_id) {
  * (RENDER) A search for a given song query
  */
 $app->get('/search/:query(/:count(/:page))', function ($query, $count=50, $page=1) {
-	xdebug_break();
 	$search = new Search();
 	echo $search->returnSearchView($query, $count, $page);
 });
