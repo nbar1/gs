@@ -33,12 +33,12 @@ class Player extends Base
 	public function playNextSong()
 	{
 		$currentPlayingSong = $this->getQueue()->getPlayingSong();
-		if($currentPlayingSong !== false)
+		if ($currentPlayingSong !== false)
 		{
 			$this->markSongPlayed($currentPlayingSong['id']);
 		}
 
-		if($this->getQueue()->getNextSong() === false && $this->config['autoplay'] === true)
+		if ($this->getQueue()->getNextSong() === false && $this->config['autoplay'] === true)
 		{
 			// Get autoplay song
 			$autoplay = new Autoplay();
@@ -85,7 +85,11 @@ class Player extends Base
 	 */
 	public function renderView()
 	{
-		return $this->templateEngine->draw('player');
+		//if (isset($_SESSION['ls_id']) && $this->getSession()->checkIfSessionIsActive($_SESSION['ls_id']))
+		//{
+			return $this->templateEngine->draw('player');
+		//}
+		//return $this->templateEngine->draw('player_start_session');
 	}
 }
 ?>

@@ -295,10 +295,23 @@ class Dao extends Base
 	 */
 	public function getActiveSessions()
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id, title, host, location_based, coordinates FROM sessions WHERE active = 1 AND started > timestampadd(hour, -24, now())");
+		$dbh = $this->getDatabase()->prepare("SELECT id, title, host, location_based, coordinates FROM sessions WHERE active=1 AND started > timestampadd(hour, -24, now())");
 		$dbh->execute();
 		return $dbh->fetchAll(PDO::FETCH_ASSOC);
 	}
+
+	/**
+	 * Check if session is active
+	 *
+	 * @return bool
+	 */
+	public function checkIfSessionIsActive($session_id)
+	{
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM sessions WHERE id=? AND active=1 started > timestampadd(hour, -24, now())");
+		$dbh->execute();
+		return (bool) $dbh->rowCount();
+	}
+
 	/**
 	 * Store new session in database
 	 *

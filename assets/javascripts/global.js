@@ -65,12 +65,14 @@ gs = {
 	 * Submit a new search
 	 */
 	searchSubmit: function() {
-		$('#search_input').blur();
-		gs.showLoader();
-		$.ajax({url:'/search/'+$('#search_input').val()}).done(function(data) {
-			gs.loadView(data, 'search');
-			gs.hideLoader();
-		});
+		if($('#search_input').val() != '') {
+			$('#search_input').blur();
+			gs.showLoader();
+			$.ajax({url:'/search/'+$('#search_input').val()}).done(function(data) {
+				gs.loadView(data, 'search');
+				gs.hideLoader();
+			});
+		}
 	},
 
 	/**
@@ -187,14 +189,6 @@ gs = {
 }
 
 gs.init();
-
-
-
-
-
-
-
-
 
 function getCookies() {
     var c = document.cookie, v = 0, cookies = {};

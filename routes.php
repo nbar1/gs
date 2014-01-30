@@ -24,13 +24,9 @@ $app->get('/', function () use ($base) {
 $app->get('/queue', function () use ($base) {
 	echo $base->getQueue()->renderView();
 });
-$app->get('/phpinfo', function () use ($base) {
-	echo phpinfo();
-});
 $app->get('/my_session', function () use ($base) {
 	var_dump($_SESSION);
 });
-
 /**
  * Adds a song to the queue
  */
@@ -40,9 +36,9 @@ $app->post('/queue/add/', function () use ($base) {
 		$_POST['songID'],
 		$_POST['songTitle'],
 		$_POST['songArtist'],
-		$_REQUEST['songArtistId'],
-		$_REQUEST['songImage'],
-		$_REQUEST['songPriority']
+		$_POST['songArtistId'],
+		$_POST['songImage'],
+		$_POST['songPriority']
 	);
 	echo $base->getQueue()->addSongToQueue($base->getSong(), $base->getUser());
 });

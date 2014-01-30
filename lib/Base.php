@@ -58,7 +58,7 @@ class Base
 	 */
 	public function __construct()
 	{
-		require('config.php');
+		require('../config.php');
 		$this->config = $config;
 		$this->initTemplateEngine();
 	}
@@ -193,8 +193,8 @@ class Base
 	{
 		$this->templateEngine = new \Rain\Tpl;
 		$config = array(
-			"tpl_dir"	=> "assets/templates/",
-			"cache_dir"	=> "tmp/",
+			"tpl_dir"	=> "../assets/templates/",
+			"cache_dir"	=> "../tmp/",
 			"tpl_ext"	=> "phtml",
 		);
 		$this->templateEngine->configure($config);

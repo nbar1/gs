@@ -92,4 +92,15 @@ class Session extends Base
 	{
 		return $this->getDao()->getActiveSessions();
 	}
+
+	/**
+	 * Check if session is active
+	 *
+	 * @param int $session_id Session ID
+	 * @return array Active sessions within 24 hours
+	 */
+	public function checkIfSessionIsActive($session_id)
+	{
+		return $this->getDao()->checkIfSessionIsActive($session_id);
+	}
 }
