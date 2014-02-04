@@ -138,5 +138,30 @@ class Queue extends Base
 			return $this->getUser()->renderView();
 		}
 	}
+
+	/**
+	 * Send data to view
+	 *
+	 * @return string
+	 */
+	public function returnQueue()
+	{
+		//if($this->getUser()->getUserBySession() === true)
+		//{
+			$queue = $this->getQueue();
+			for($x=0; $x<sizeof($queue); $x++)
+			{
+				$queue[$x]['played_by_name'] = $this->getUser()->getNicknameById($queue[$x]['played_by']);
+			}
+			
+			return $queue;
+
+			//$this->templateEngine->assign('queue', $queue);
+			//return $this->templateEngine->draw('queue');
+		//}
+		//else {
+		//	return $this->getUser()->renderView();
+		//}
+	}
 }
 ?>

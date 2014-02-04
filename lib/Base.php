@@ -17,6 +17,11 @@ class Base
 	private $dao;
 
 	/**
+	 * API Handler
+	 */
+	public $api_handler;
+
+	/**
 	 * GrooveShark API
 	 */
 	public $gsapi;
@@ -75,6 +80,20 @@ class Base
 			$this->dao = new Dao();
 		}
 		return $this->dao;
+	}
+
+	/**
+	 * Returns the API Handler object
+	 *
+	 * @return ApiHandler
+	 */
+	public function getApiHandler()
+	{
+		if (!isset($this->api_handler))
+		{
+			$this->api_handler = new ApiHandler();
+		}
+		return $this->api_handler;
 	}
 
 	/**

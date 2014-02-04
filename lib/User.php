@@ -90,15 +90,32 @@ class User extends Base
 	 *
 	 * @return bool
 	 */
-	public function getUserBySession()
+	public function getUserByHash($hash)
 	{
 		// perform some mild validation on the session id
-		if(isset($_SESSION['gs_auth']) && preg_match('/^[a-f0-9]{32}$/', $_SESSION['gs_auth']) && $this->getDao()->getUserExistsByHash($_SESSION['gs_auth']))
+		if(preg_match('/^[a-f0-9]{32}$/', $hash) && $this->getDao()->getUserExistsByHash($hash))
 		{
-			$user = $this->getDao()->getUserInformationByHash($_SESSION['gs_auth']);
+			$user = $this->getDao()->getUserInformationByHash($hash);
 			$this->setId($user['id'])
 				->setNickname($user['nickname'])
 				->setActiveState($user['active']);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get user information from session
+	 *
+	 * @param $hash User hash [optional]
+	 * @return bool
+	 */
+	public function isAuthenticated()
+	{
+		$hash = (!empty($_GET['hash'])) ? $_GET['hash'] : ((!empty($_POST['hash'])) ? $_POST['hash'] : false);
+ 		// perform some mild validation on the session id
+		if(isset($hash) && preg_match('/^[a-f0-9]{32}$/', $hash) && $this->getDao()->getUserExistsByHash($hash))
+		{
 			return true;
 		}
 		return false;
@@ -128,15 +145,7 @@ class User extends Base
 		$created = date('Y-m-d H:i:s');
 		$hash = md5($nickname.$created);
 
-		if($this->getDao()->createUser(array($nickname, $hash, $created, $created)))
-		{
-			$_SESSION['gs_auth'] = $hash;
-			header('location: '.$_SERVER['PHP_SELF']);
-			return true;
-		}
-		else {
-			return false;
-		}
+		return $this->getDao()->createUser(array($nickname, $hash, $created, $created));
 	}
 
 	/**
@@ -145,9 +154,20 @@ class User extends Base
 	 * @param string|null $nickname Nickname
 	 * @return bool
 	 */
-	public function authenticate($nickname = null)
+	public function authenticate($nickname = false)
 	{
-		if($nickname === null && $this->getUserBySession()) $nickname = $this->getNickname();
+		if($nickname === false)
+		{
+			$hash = (!empty($_GET['hash'])) ? $_GET['hash'] : ((!empty($_POST['hash'])) ? $_POST['hash'] : null);
+			if($hash)
+			{
+				$user_info = $this->getDao()->getUserInformationByHash($hash);
+				return $this->authenticate($user_info['nickname']);
+			}
+			ApiHandler::setStatusHeader(500);
+			return array('message' => 'No credentials received');
+		}
+
 		if(strlen($nickname) > 32) $nickname = substr($nickname, 0, 32);
 
 		if($this->getDao()->getUserExistsByNickname($nickname))
@@ -157,12 +177,22 @@ class User extends Base
 			$this->setId($user['id'])
 				->setNickname($user['nickname'])
 				->setActiveState($user['active']);
-			$_SESSION['gs_auth'] = $hash;
-			return true;
-			
+
+			// Return response
+			ApiHandler::setStatusHeader(200);
+			return array('hash' => $hash);
 		}
-		else {
-			return $this->createUser($nickname);
+		else
+		{
+			if($this->createUser($nickname))
+			{
+				return $this->authenticate($nickname);
+			}
+			else
+			{
+				ApiHandler::setStatusHeader(500);
+				return array('message' => 'Could not create user');
+			}
 		}
 	}
 
@@ -203,16 +233,6 @@ class User extends Base
 	{
 		$user = $this->getDao()->getUserInformationByNickname($nickname);
 		return $user['id'];
-	}
-
-	/**
-	 * Send data to view
-	 *
-	 * @return string
-	 */
-	public function renderView()
-	{
-		return $this->templateEngine->draw('login');
 	}
 }
 ?>

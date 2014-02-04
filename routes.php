@@ -6,6 +6,11 @@
 $base = new Base();
 
 /**
+ * Set default API headers
+ */
+$base->getApiHandler()->setHeaders();
+
+/**
  * Base
  */
 /**
@@ -15,33 +20,80 @@ $app->get('/', function () use ($base) {
 	echo $base->templateEngine->draw('base', $return_string = false);
 });
 
+
+
 /**
  * Queue
  */
+
 /**
- * (RENDER) Queue
+ * Returns queue
  */
-$app->get('/queue', function () use ($base) {
-	echo $base->getQueue()->renderView();
+$app->get('/api/queue/', function() use($base) {
+	if($base->getUser()->isAuthenticated())
+	{
+		echo ApiHandler::bundle($base->getQueue()->returnQueue());
+	}
+	else
+	{
+		ApiHandler::setStatusHeader(401);
+		echo ApiHandler::bundle(array('message' => 'Not Authenticated'));
+	}
 });
-$app->get('/my_session', function () use ($base) {
-	var_dump($_SESSION);
-});
+
 /**
  * Adds a song to the queue
  */
-$app->post('/queue/add/', function () use ($base) {
-	$base->getUser()->authenticate();
-	$base->getSong()->setSongInformation(
-		$_POST['songID'],
-		$_POST['songTitle'],
-		$_POST['songArtist'],
-		$_POST['songArtistId'],
-		$_POST['songImage'],
-		$_POST['songPriority']
-	);
-	echo $base->getQueue()->addSongToQueue($base->getSong(), $base->getUser());
+$app->post('/api/queue/add/', function () use ($base) {
+
+	if($base->getUser()->isAuthenticated())
+	{
+		$base->getSong()->setSongInformation(
+			$_POST['songID'],
+			$_POST['songTitle'],
+			$_POST['songArtist'],
+			$_POST['songArtistId'],
+			$_POST['songImage'],
+			$_POST['songPriority']
+		);
+		ApiHandler::bundle($base->getQueue()->addSongToQueue($base->getSong(), $base->getUser()));
+	}
+	else
+	{
+		ApiHandler::setStatusHeader(401);
+		echo ApiHandler::bundle(array('message' => 'Not Authenticated'));
+	}
 });
+
+/**
+ * Authenticate user
+ *
+ * @TODO: Remove access via inline variable, switch to post
+ */
+$app->get('/api/authenticate/:nickname/', function($nickname) use($base) {
+	$nickname = (!empty($nickname)) ? $nickname : false;
+	echo ApiHandler::bundle($base->getUser()->authenticate($nickname));
+});
+$app->post('/api/authenticate/', function() use($base) {
+	$nickname = (!empty($_POST['nickname'])) ? $_POST['nickname'] : false;
+	echo ApiHandler::bundle($base->getUser()->authenticate($nickname));
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Song
@@ -49,9 +101,18 @@ $app->post('/queue/add/', function () use ($base) {
 /**
  * Gets information for a given song
  */
-$app->get('/song/:token/', function ($token) {
-	$song = new Song($token, true);
-	echo json_encode($song->getSongInformation());
+$app->get('/api/song/:token/', function ($token) use ($base) {
+	if($base->getUser()->isAuthenticated())
+	{
+		$song = new Song($token, true);
+		echo ApiHandler::bundle($song->getSongInformation());
+	}
+	else
+	{
+		ApiHandler::setStatusHeader(401);
+		echo ApiHandler::bundle(array('message' => 'Not Authenticated'));
+	}
+	
 });
 
 /**
@@ -60,45 +121,32 @@ $app->get('/song/:token/', function ($token) {
 /**
  * (RENDER) A search for a given artist query
  */
-$app->get('/search/artist/:artist_id', function ($artist_id) {
-	$search = new Search();
-	echo $search->returnArtistSearchView($artist_id);
+$app->get('/api/search/artist/:artist_id', function ($artist_id) use ($base) {
+	if($base->getUser()->isAuthenticated())
+	{
+		$search = new Search();
+		echo ApiHandler::bundle($search->doArtistSearch($artist_id));
+	}
+	else
+	{
+		ApiHandler::setStatusHeader(401);
+		echo ApiHandler::bundle(array('message' => 'Not Authenticated'));
+	}
 });
 /**
  * (RENDER) A search for a given song query
  */
-$app->get('/search/:query(/:count(/:page))', function ($query, $count=50, $page=1) {
-	$search = new Search();
-	echo $search->returnSearchView($query, $count, $page);
-});
-
-/**
- * Session
- */
-$app->post('/user/geolocation/', function () use ($base){
-	$session = $base->getSession()->matchSessionToCoordinates($_POST['latitude'], $_POST['longitude']);
-	$base->getSession()->setSession($session['id']);
-	echo json_encode($session);
-});
-$app->post('/session/start/', function () use ($base){
-	$host = $base->getUser()->getIdByNickname($_POST['host']);
-	echo $base->getSession()->startSession($_POST['title'], $host, true, $_POST['coordinates']);
-});
-
-/**
- * User
- */
-/**
- * (RENDER) Register a user form
- */
-$app->get('/user/register/', function () use ($base) {
-	echo $base->getUser()->renderView();
-});
-/**
- * (RENDER) Register user to database
- */
-$app->post('/user/register/', function () use ($base){
-	echo $base->getUser()->authenticate($_POST['nickname']);
+$app->get('/api/search/:query(/:count(/:page))', function ($query, $count=50, $page=1) use ($base) {
+	if($base->getUser()->isAuthenticated())
+	{
+		$search = new Search();
+		echo ApiHandler::bundle($search->doSearch($query, $count, $page));
+	}
+	else
+	{
+		ApiHandler::setStatusHeader(401);
+		echo ApiHandler::bundle(array('message' => 'Not Authenticated'));
+	}
 });
 
 /**

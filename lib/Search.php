@@ -10,11 +10,8 @@ class Search extends Base
 	/**
 	 * Get search results from TinySong
 	 *
-	 * Legacy Function
-	 *
 	 * Returns an array of search results based on a given query
 	 *
-	 * @TODO: REMOVE LEGACY CODE
 	 * @param string $query Search query
 	 * @return array
 	 */
@@ -94,16 +91,16 @@ class Search extends Base
 	}
 
 	/**
-	 * Return a search view
+	 * Return search
 	 *
 	 * If GS API fails, falls back to tinysong
 	 *
 	 * @param string $query Search query
 	 * @param int $count Number of results to return
 	 * @param int $page Page number
-	 * @return string
+	 * @return array
 	 */
-	public function returnSearchView($query, $count=30, $page=1)
+	public function doSearch($query, $count=30, $page=1)
 	{
 		//debug
 		$count = 10;
@@ -111,7 +108,11 @@ class Search extends Base
 		{
 			$results_artists = $this->parseArtistResultsForRelevantArtist($query, $this->getArtistSearchResults($query));
 			$results_songs = $this->getSongSearchResults($query, $count, $page);
-			return $this->renderFullSearchView($results_artists, $results_songs);
+			return array(
+				'type' => 'full',
+				'artists' => $results_artists,
+				'songs' => $results_songs,
+			);
 		}
 		catch (Exception $e)
 		{
@@ -120,25 +121,33 @@ class Search extends Base
 			if(isset($this->config['tinysong']['key']))
 			{
 				$results_songs = $this->getSearchResultsFromTinySong($query);
-				return $this->renderSongSearchView($results_songs);
+				return array(
+					'type' => 'tinysong',
+					'artists' => null,
+					'songs' => $results_songs,
+				);
 			}
 		}
 	}
 
 	/**
-	 * Return a search view
+	 * Return artist search
 	 *
 	 * If GS API fails, falls back to tinysong
 	 *
 	 * @param string $artist_id Search query
-	 * @return string
+	 * @return array
 	 */
-	public function returnArtistSearchView($artist_id)
+	public function doArtistSearch($artist_id)
 	{
 		try
 		{
 			$results_songs = $this->getArtistSongs($artist_id);
-			return $this->renderArtistSearchView($results_songs);
+			return array(
+				'type' => 'artist',
+				'artist' => $artist_id,
+				'songs' => $results_songs,
+			);
 		}
 		catch (Exception $e)
 		{
@@ -146,43 +155,5 @@ class Search extends Base
 		}
 	}
 
-	/**
-	 * Send full search data to view
-	 *
-	 * @param string $results_artists Search results
-	 * @param string $results_songs Search results
-	 * @return string
-	 */
-	public function renderFullSearchView($results_artists, $results_songs)
-	{
-		$this->templateEngine->assign('results_artists', $results_artists);
-		$this->templateEngine->assign('results_songs', $results_songs);
-		return $this->templateEngine->draw('search_full');
-	}
-
-	/**
-	 * Send full search data to view
-	 *
-	 * @param string $results_songs Search results
-	 * @return string
-	 */
-	public function renderSongSearchView($results_songs)
-	{
-		$this->templateEngine->assign('results_songs', $results_songs);
-		return $this->templateEngine->draw('search_songs');
-	}
-
-	/**
-	 * Send full search data to view
-	 *
-	 * @param string $results_songs Search results
-	 * @return string
-	 */
-	public function renderArtistSearchView($results_songs)
-	{
-		$this->templateEngine->assign('artist_name', $results_songs[0]['ArtistName']);
-		$this->templateEngine->assign('results_songs', $results_songs);
-		return $this->templateEngine->draw('search_artist');
-	}
 }
 ?>
