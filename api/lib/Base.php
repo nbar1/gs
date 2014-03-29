@@ -17,11 +17,6 @@ class Base
 	private $dao;
 
 	/**
-	 * API Handler
-	 */
-	public $api_handler;
-
-	/**
 	 * GrooveShark API
 	 */
 	public $gsapi;
@@ -63,9 +58,26 @@ class Base
 	 */
 	public function __construct()
 	{
-		require('../config.php');
-		$this->config = $config;
-		$this->initTemplateEngine();
+		$this->config =  array(
+			'autoplay' => true,
+			'api' => array( // Obtain a GrooveShark API key by requesting access at http://developers.grooveshark.com
+				'key' => 'nbar1', // GrooveShark API key
+				'secret' => '1f64634987618265edb26fe236c00011', // GrooveShark API secret
+			),
+			'tinysong' => array(
+				'key' => 'a2e5ffd9cc99a2bee6207e4921def6a7', // TinySong API key
+			),
+			'grooveshark' => array(
+				'username' => 'nbarone', // GrooveShark username
+				'password' => '17543366', // plaintext GrooveShark password
+			),
+			'database' => array(
+				'host' => 'localhost',
+				'user' => 'root',
+				'password' => 'nick',
+				'db_name' => 'nbar1_gs',
+			),
+		);
 	}
 
 	/**
@@ -80,20 +92,6 @@ class Base
 			$this->dao = new Dao();
 		}
 		return $this->dao;
-	}
-
-	/**
-	 * Returns the API Handler object
-	 *
-	 * @return ApiHandler
-	 */
-	public function getApiHandler()
-	{
-		if (!isset($this->api_handler))
-		{
-			$this->api_handler = new ApiHandler();
-		}
-		return $this->api_handler;
 	}
 
 	/**
@@ -203,37 +201,6 @@ class Base
 			$_SESSION['gsCountry'] = $this->getGsAPI()->getCountry();
 		}
 		$this->getGsAPI()->authenticate($this->config['grooveshark']['username'], $this->config['grooveshark']['password']);
-	}
-
-	/**
-	 * Initiate template engine
-	 */
-	private function initTemplateEngine()
-	{
-		$this->templateEngine = new \Rain\Tpl;
-		$config = array(
-			"tpl_dir"	=> "../assets/templates/",
-			"cache_dir"	=> "../tmp/",
-			"tpl_ext"	=> "phtml",
-		);
-		$this->templateEngine->configure($config);
-	}
-
-	/**
-	 * Returns a helper class
-	 *
-	 * @param string $helper The name of the helper class
-	 * @return Helper class
-	 */
-	protected function getHelper($helper)
-	{
-		$helper = 'Helper_'.ucfirst($helper);
-		if(!isset($this->$$helper) && class_exists($helper))
-		{
-			$this->$$helper = new $helper;
-			return $this->$$helper;
-		}
-		return $this->$$helper;
 	}
 }
 ?>

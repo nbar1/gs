@@ -65,7 +65,7 @@ class Player extends Base
 	 */
 	public function markSongPlayed($id)
 	{
-		$this->getDao()->markSongPlayed($id);
+		return $this->getDao()->markSongPlayed($id);
 	}
 
 	/**
@@ -76,20 +76,6 @@ class Player extends Base
 	public function markSongPlaying($id)
 	{
 		$this->getDao()->markSongPlaying($id);
-	}
-
-	/**
-	 * Send data to view
-	 *
-	 * @return string
-	 */
-	public function renderView()
-	{
-		//if (isset($_SESSION['ls_id']) && $this->getSession()->checkIfSessionIsActive($_SESSION['ls_id']))
-		//{
-			return $this->templateEngine->draw('player');
-		//}
-		//return $this->templateEngine->draw('player_start_session');
 	}
 }
 ?>

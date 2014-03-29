@@ -102,8 +102,6 @@ class Search extends Base
 	 */
 	public function doSearch($query, $count=30, $page=1)
 	{
-		//debug
-		$count = 10;
 		try
 		{
 			$results_artists = $this->parseArtistResultsForRelevantArtist($query, $this->getArtistSearchResults($query));
@@ -133,8 +131,6 @@ class Search extends Base
 	/**
 	 * Return artist search
 	 *
-	 * If GS API fails, falls back to tinysong
-	 *
 	 * @param string $artist_id Search query
 	 * @return array
 	 */
@@ -151,7 +147,7 @@ class Search extends Base
 		}
 		catch (Exception $e)
 		{
-			return $this->renderError("Rate Limit Error");
+			return false;
 		}
 	}
 

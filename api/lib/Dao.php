@@ -20,7 +20,7 @@ class Dao extends Base
 	{
 		if (!isset($this->db))
 		{
-			$db = new PDO("mysql:host={$this->config['database']['host']};dbname={$this->config['database']['db_name']}", $this->config['database']['user'], $this->config['database']['password']);
+			$db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
 			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			return $db;
 		}
@@ -48,8 +48,7 @@ class Dao extends Base
 	public function markSongPlayed($id)
 	{
 		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='played' WHERE id=?");
-		$dbh->execute(array($id));
-		return true;
+		return $dbh->execute(array($id));
 	}
 
 	/**
@@ -199,52 +198,52 @@ class Dao extends Base
 	}
 
 	/**
-	 * Check if user exists by given hash
+	 * Check if user exists by given API key
 	 *
-	 * @param string $hash User authentication hash
+	 * @param string $api_key
 	 * @return bool User exists
 	 */
-	public function getUserExistsByHash($hash)
+	public function getUserExistsByApiKey($api_key)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE hash=? LIMIT 1");
-		return ($dbh->execute(array($hash)) && $dbh->rowCount() > 0) ? true : false;
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE api_key=? LIMIT 1");
+		return ($dbh->execute(array($api_key)) && $dbh->rowCount() > 0) ? true : false;
 	}
 
 	/**
-	 * Get user information by hash
+	 * Get user information by api key
 	 *
-	 * @param string $hash User authentication hash
+	 * @param string $api_key
 	 * @return array|false User Information
 	 */
-	public function getUserInformationByHash($hash)
+	public function getUserInformationByApiKey($api_key)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active, ts_created FROM users WHERE hash=? LIMIT 1");
-		$dbh->execute(array($hash));
+		$dbh = $this->getDatabase()->prepare("SELECT id, api_key, username, active, ts_created FROM users WHERE api_key=? LIMIT 1");
+		$dbh->execute(array($api_key));
 		return $dbh->fetch(PDO::FETCH_ASSOC);
 	}
 
 	/**
-	 * Check if user exists by given nickname
+	 * Check if user exists by given username
 	 *
-	 * @param string $nickname Nickname
+	 * @param string $username
 	 * @return bool Status
 	 */
-	public function getUserExistsByNickname($nickname)
+	public function getUserExistsByUsername($username)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE nickname=? LIMIT 1");
-		return ($dbh->execute(array($nickname)) && $dbh->rowCount() > 0) ? true : false;
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM users WHERE username=? LIMIT 1");
+		return ($dbh->execute(array($username)) && $dbh->rowCount() > 0) ? true : false;
 	}
 
 	/**
-	 * Get user information by nickname
+	 * Get user information by username
 	 *
-	 * @param string $nickname User nickname
+	 * @param string $username
 	 * @return array|false User Information
 	 */
-	public function getUserInformationByNickname($nickname)
+	public function getUserInformationByUsername($username)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active, ts_created FROM users WHERE nickname=? LIMIT 1");
-		$dbh->execute(array($nickname));
+		$dbh = $this->getDatabase()->prepare("SELECT id, api_key, username, password, active, ts_created FROM users WHERE username=? LIMIT 1");
+		$dbh->execute(array($username));
 		return $dbh->fetch(PDO::FETCH_ASSOC);
 	}
 
@@ -256,7 +255,7 @@ class Dao extends Base
 	 */
 	public function getUserInformationById($user_id)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id, hash, nickname, active, ts_created FROM users WHERE id=? LIMIT 1");
+		$dbh = $this->getDatabase()->prepare("SELECT id, api_key, username, active, ts_created FROM users WHERE id=? LIMIT 1");
 		$dbh->execute(array($user_id));
 		return $dbh->fetch(PDO::FETCH_ASSOC);
 	}
@@ -269,7 +268,7 @@ class Dao extends Base
 	 */
 	public function getRecentPromotionCount($user_id)
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL 120 MINUTE)");
+		$dbh = $this->getDatabase()->prepare("SELECT id FROM queue WHERE priority IN('high', 'med') AND promoted_by=? AND ts_added >= DATE_SUB(NOW(), INTERVAL " . GS_PROMOTION_TIMELIMIT . " MINUTE)");
 		$dbh->execute(array($user_id));
 		return $dbh->rowCount();
 	}
@@ -282,10 +281,11 @@ class Dao extends Base
 	 */
 	public function createUser($user)
 	{
-		if (sizeof($user) !== 4) return false;
-		$dbh = $this->getDatabase()->prepare("INSERT INTO users (nickname, hash, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?)");
+		if (sizeof($user) !== 5) return false;
+		$dbh = $this->getDatabase()->prepare("INSERT INTO users (username, password, api_key, ts_created, ts_lastlogin) VALUES (?, ?, ?, ?, ?)");
 		return $dbh->execute($user);
 	}
+
 
 	/**
 	 * Get active sessions
