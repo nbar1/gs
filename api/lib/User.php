@@ -184,7 +184,10 @@ class User extends Base
 		}
 		else
 		{
-			return USER_NOT_FOUND;
+			if($this->registerUser($username, $password) === true)
+			{
+				return $this->login($username, $password);
+			}
 		}
 	}
 
