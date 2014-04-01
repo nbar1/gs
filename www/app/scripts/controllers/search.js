@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('gsApp')
-.controller('SearchCtrl', function ($scope, $rootScope, $cookies, $location, $http, $routeParams, SearchService) {
+.controller('SearchCtrl', function ($scope, $rootScope, $cookies, $location, $http, $routeParams) {
 	$rootScope.searchbox = true;
 	$rootScope.showQueueButton = true;
 	$scope.showOptions = false;
@@ -34,10 +34,8 @@ angular.module('gsApp')
 						$scope.artists = data.artists;
 					}
 					$scope.songs = data.songs;
-					console.log(data.songs);
 				}
 				else {
-					console.log('none');
 					$scope.errorMessage = "No Songs Found";
 					$scope.templateUrl = "views/error.html";
 				}
@@ -55,14 +53,12 @@ angular.module('gsApp')
 			songID: song.SongID,
 			songPriority: priority
 		}
-		console.log(post);
 		$http({
 			url: '/api/v1/queue/add/?apikey=' + $cookies.gs_apikey,
 			method: 'POST',
 			data: post,
 		})
 		.success(function(data) {
-			console.log(data);
 			if(data.success) {
 				
 			}
