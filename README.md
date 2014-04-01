@@ -2,6 +2,9 @@
 
 A party mode playlist that interfaces with GrooveShark
 
+## Notes
+The current version on master is based on AngularJS and a RESTful back-end.
+
 ## Installation
 
 * Pull in repo
