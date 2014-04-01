@@ -4,13 +4,17 @@
  */
 $base = new Base();
 
+if(isset($_SERVER["CONTENT_TYPE"]) && stripos($_SERVER["CONTENT_TYPE"], "application/json") === 0) {
+	$_POST = json_decode(file_get_contents("php://input"), true);
+}
+
 /**
  * Get queue
  */
 $app->get('/api/v1/queue/', function() use($base) {
 	if(ApiHandler::validKey())
 	{
-		ApiHandler::sendResponse(200, true, $base->getQueue()->getQueue());
+		ApiHandler::sendResponse(200, true, array('queue' => $base->getQueue()->getQueue()));
 	}
 	else
 	{
@@ -24,14 +28,16 @@ $app->get('/api/v1/queue/', function() use($base) {
 $app->post('/api/v1/queue/add/', function () use ($base) {
 	if(ApiHandler::validKey())
 	{
+		$song_info = $base->getSong()->getSongInformationFromGrooveShark($_POST['songID']);
 		$base->getSong()->setSongInformation(
-			$_POST['songID'],
-			$_POST['songTitle'],
-			$_POST['songArtist'],
-			$_POST['songArtistId'],
-			$_POST['songImage'],
+			$song_info['SongID'],
+			$song_info['SongName'],
+			$song_info['ArtistName'],
+			$song_info['ArtistID'],
+			$song_info['CoverArtFilename'],
 			$_POST['songPriority']
 		);
+		$base->getUser()->getUserByApiKey($_GET['apikey']);
 		if($base->getQueue()->addSongToQueue($base->getSong(), $base->getUser()))
 		{
 			ApiHandler::sendResponse(200, true);
@@ -64,14 +70,15 @@ $app->post('/api/v1/register/', function() use($base) {
 	{
 		ApiHandler::sendResponse(500, false, array('message' => 'Error creating user'));
 	}
-	
 });
 
 /**
  * Login
  */
 $app->post('/api/v1/login/', function() use($base) {
-	$login = $base->getUser()->login($_POST['username'], $_POST['password']);
+	$username = (isset($_POST['username'])) ? $_POST['username'] : null;
+	$password = (isset($_POST['password'])) ? $_POST['password'] : null;
+	$login = $base->getUser()->login($username, $password);
 	if($login === USERNAME_REQUIRED)
 	{
 		ApiHandler::sendResponse(200, false, array('message' => 'Username required'));

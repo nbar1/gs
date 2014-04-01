@@ -14,7 +14,12 @@ class Queue extends Base
 	 */
 	public function getQueue()
 	{
-		return $this->getDao()->getQueue();
+		$queue = $this->getDao()->getQueue();
+		for($x=0; $x<sizeof($queue); $x++)
+		{
+			$queue[$x]['played_by_name'] = $this->getUser()->getUsernameById($queue[$x]['played_by']);
+		}
+		return $queue;
 	}
 
 	/**

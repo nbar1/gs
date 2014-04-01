@@ -70,9 +70,9 @@ class User extends Base
 	 *
 	 * @return User $this
 	 */
-	private function _setUsername($usernane)
+	private function _setUsername($username)
 	{
-		$this->_username = $id;
+		$this->_username = $username;
 		return $this;
 	}
 
@@ -128,11 +128,13 @@ class User extends Base
 	/**
 	 * Get Available Promotions
 	 *
+	 * @param int $user_id
 	 * @return int Available promotions
 	 */
-	public function getAvailablePromotions()
+	public function getAvailablePromotions($user_id = null)
 	{
-		$available_promotions = GS_PROMOTION_MAX - $this->getDao()->getRecentPromotionCount($this->getId());
+		$id = ($user_id) ? $user_id : $this->getId();
+		$available_promotions = GS_PROMOTION_MAX - $this->getDao()->getRecentPromotionCount($id);
 		return ($available_promotions > 0) ? $available_promotions : 0;
 	}
 
@@ -170,12 +172,12 @@ class User extends Base
 		if(!$username) return USERNAME_REQUIRED;
 		if(!$password) return PASSWORD_REQUIRED;
 		if(strlen($username) > 32) return USERNAME_TOO_LONG;
-
 		if($this->getDao()->getUserExistsByUsername($username))
 		{
 			$user = $this->getDao()->getUserInformationByUsername($username);
 			$user_info = array(
 				'username' => $user['username'],
+				'promotions' => $this->getAvailablePromotions($user['id']),
 				'api_key' => $user['api_key']
 			);
 			return (md5($password) === $user['password']) ? $user_info : BAD_PASSWORD;

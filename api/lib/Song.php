@@ -439,6 +439,15 @@ class Song extends Base
 	}
 
 	/**
+	 * Get Song Information From GrooveShark
+	 */
+	public function getSongInformationFromGrooveShark($song_id)
+	{
+		$this->authenticateToGrooveShark();
+		return $this->getGsAPI()->getSongInfo($song_id);
+	}
+
+	/**
 	 * Store Metadata
 	 *
 	 * Store song metadata in database

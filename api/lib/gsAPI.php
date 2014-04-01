@@ -469,7 +469,7 @@ class gsAPI {
     /*
     * Returns metadata about the given songID
     */
-    public static function getSongInfo($songID)
+    public function getSongInfo($songID)
     {
         if (!is_numeric($songID)) {
             return array();
