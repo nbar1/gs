@@ -1,6 +1,0 @@
-*.swp
-*.ico
-.git
-vendor
-api/config.php
-
