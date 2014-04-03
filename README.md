@@ -10,7 +10,7 @@ The current version is based on AngularJS and a RESTful back-end.
 * Pull in repo
 * Run `composer install`
 * Import database.sql to your mysql server
-* Copy api/config.php.example to api/config.php and fill in your credentials
+* Copy `api/config.php.example` to `api/config.php` and fill in your credentials
 
 
 ## GrooveShark API
