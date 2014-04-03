@@ -3,15 +3,14 @@
 A party mode playlist that interfaces with GrooveShark
 
 ## Notes
-The current version on master is based on AngularJS and a RESTful back-end.
+The current version is based on AngularJS and a RESTful back-end.
 
 ## Installation
 
 * Pull in repo
 * Run `composer install`
-* Create a directory in the root called tmp with proper write permissions
 * Import database.sql to your mysql server
-* Update config.php with your specific details
+* Copy api/config.php.example to api/config.php and fill in your credentials
 
 
 ## GrooveShark API
