@@ -156,30 +156,32 @@ $app->get('/api/v1/search/:query(/:count(/:page))', function ($query, $count = 3
 /**
  * (RENDER) Base music player
  */
-$app->get('/player/', function () {
+$app->get('/api/v1/player/next', function () {
 	$player = new Player();
-	echo $player->renderView();
+	$song = $player->playNextSong();
+	if($song !== false)
+	{
+		ApiHandler::sendResponse(200, true, array('token' => $song));
+	}
+	else
+	{
+		ApiHandler::sendResponse(200, false);
+	}
 });
 /**
  * Gets the stream token for a given song
  */
-$app->get('/player/stream/:token/', function ($token) {
+$app->get('/api/v1/player/stream/:token', function ($token) {
 	$player = new Player();
-	echo $player->getStream($token);
+	ApiHandler::sendResponse(200, true, $player->getStream($token));
 });
 /**
  * Validates the song is playing with GrooveShark after 30 seconds
  */
-$app->post('/player/stream/validate/', function () {
+$app->post('/api/v1/player/stream/validate', function () {
 	$player = new Player();
-	echo $player->markSong30Seconds($_POST['streamKey'], $_POST['streamServerID']);
-});
-/**
- * Processing songs and returns the token of the next song to be played
- */
-$app->get('/player/next/', function () {
-	$player = new Player();
-	echo $player->playNextSong();
+	$player->markSong30Seconds($_POST['streamKey'], $_POST['streamServerID']);
+	ApiHandler::sendResponse(200, true);
 });
 
 ?>

@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('gsApp')
-.controller('LoginCtrl', function ($scope, $rootScope, $cookies, $location, $http) {
-	$scope.searchbox = false;
+.controller('LoginCtrl', function ($scope, $rootScope, $cookies, $location, LoginModel) {
+	$rootScope.searchbox = false;
 	
 	// If user already has an apikey, send them to the queue
 	if($cookies.gs_apikey) {
@@ -12,20 +12,13 @@ angular.module('gsApp')
 	// Submit a login
 	$scope.login = function(isValid) {
 		if(isValid) {
-			$http({
-				url: '/api/v1/login',
-				method: 'POST',
-				data: {username: $scope.username, password: $scope.password}
-			})
-			.success(function(data) {
-				if(data.success) {
-					$cookies.gs_apikey = data.api_key;
-					$rootScope.username = data.username;
-					$rootScope.promotions = data.promotions;
+			LoginModel.login($scope.username, $scope.password).then(function(response) {
+				if(response.success) {
+					$cookies.gs_apikey = response.api_key;
 					$location.path('/queue');
 				}
 				else {
-					$scope.error_message = data.message;
+					$scope.error_message = response.message;
 				}
 			});
 		}

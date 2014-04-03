@@ -19,7 +19,7 @@ class Player extends Base
 		// Make request to Grooveshark and return data as JSON
 		$streamInfo = $this->getGsAPI()->getSubscriberStreamKey($song, false);
 		
-		echo json_encode($streamInfo);
+		return $streamInfo;
 	}
 
 	/**
@@ -53,9 +53,12 @@ class Player extends Base
 
 		$nextSong = $this->getQueue()->getNextSong();
 
-		$this->markSongPlaying($nextSong['id']);
-
-		return $nextSong['token'];
+		if($nextSong)
+		{
+			$this->markSongPlaying($nextSong['id']);
+			return $nextSong['token'];
+		}
+		return false;
 	}
 
 	/**

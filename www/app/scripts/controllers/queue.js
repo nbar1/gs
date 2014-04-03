@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('gsApp')
-.controller('QueueCtrl', function ($scope, $rootScope, $cookies, $location, $http) {
+.controller('QueueCtrl', function ($scope, $rootScope, $cookies, $location, $interval, QueueModel) {
 	$rootScope.searchbox = true;
 	$rootScope.showQueueButton = false;
 	
@@ -9,13 +9,16 @@ angular.module('gsApp')
 	if(!$cookies.gs_apikey) {
 		$location.path('/');
 	}
-
-	$http({
-		url: '/api/v1/queue?apikey=' + $cookies.gs_apikey,
-		method: 'GET',
-	})
-	.success(function(data) {
-		$scope.templateUrl = 'views/queue.html';
-		$scope.queue = data.queue;
-	});
+	else {
+		$scope.getQueue = function() {
+			QueueModel.getQueue().then(function(response) {
+				$scope.queue = response.queue;
+				$scope.templateUrl = 'views/queue.html';
+			});
+		}
+		$scope.fetchQueue = $interval(function() {
+			$scope.getQueue()
+		}, 10000);
+		$scope.getQueue();
+	}
 });

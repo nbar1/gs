@@ -1,13 +1,14 @@
-<div class='col-xs-6 songinfo'>
+<div class='col-xs-5 songinfo'>
 	<div class='song_name'>{{song.SongName}}</div>
 	<div class='song_artist'>{{song.ArtistName}}</div>
 	<div class='song_id'>{{song.SongID}}</div>
 	<div class='song_artist_id'>{{song.ArtistID}}</div>
 	<div class='song_image'>{{song.CoverArtFilename}}</div>
 </div>
+<div class='col-xs-1 song-status' ng-class="{'show-loading': showLoading==true}" loader></div>
 <div class='col-xs-3'>
-	<button class='btn btn-warning' ng-click="addSongToQueue(song, true)">promote</button>
+	<button class='btn btn-warning' ng-click="addSong(song, true)">promote</button>
 </div>
 <div class='col-xs-3'>
-	<button class='btn btn-success' ng-click="addSongToQueue(song, false)">add to queue</button>
+	<button class='btn btn-success' ng-click="addSong(song, false)">add to queue</button>
 </div>

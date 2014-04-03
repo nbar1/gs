@@ -188,6 +188,7 @@ class User extends Base
 			{
 				return $this->login($username, $password);
 			}
+			return USER_NOT_FOUND;
 		}
 	}
 

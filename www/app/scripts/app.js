@@ -7,6 +7,11 @@ angular.module('gsApp', [
 	'ngRoute',
 	'ngTouch',
 ])
+.run(function($rootScope, $templateCache) {
+	$rootScope.$on('$viewContentLoaded', function() {
+		$templateCache.removeAll();
+	});
+})
 .config(function($routeProvider) {
 	$routeProvider
 		.when('/', {
@@ -20,6 +25,10 @@ angular.module('gsApp', [
 		.when('/search/:query/:type?', {
 			template: '<div ng-hide="songs || errorMessage" loader></div><div ng-include="templateUrl"></div>',
 			controller: 'SearchCtrl'
+		})
+		.when('/player', {
+			template: '<div ng-hide="song || errorMessage" loader></div><div ng-include="templateUrl"></div>',
+			controller: 'PlayerCtrl'
 		})
 		.otherwise({
 			redirectTo: '/'
