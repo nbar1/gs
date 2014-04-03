@@ -1,4 +1,4 @@
-# gs
+# GrooveShrimp
 
 A party mode playlist that interfaces with GrooveShark
 
