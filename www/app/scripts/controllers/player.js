@@ -32,8 +32,7 @@ angular.module('gsApp')
 			$scope.song.streamKey = response.StreamKey;
 			$scope.song.streamServer = response.StreamServerID;
 
-			var songImage = $scope.song.image.split('_');
-			document.body.style.backgroundImage="url('http://images.gs-cdn.net/static/albums/500_" + songImage[1] + "')";
+			document.body.style.backgroundImage="url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')";
 
 			var streamTime = response.uSecs / 1000;
 			$timeout(function() {

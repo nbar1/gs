@@ -262,6 +262,7 @@ class Song extends Base
 	 */
 	public function setImage($image)
 	{
+		$image = str_replace("/90_", "", $image);
 		$this->image = $image;
 		return $this;
 	}
