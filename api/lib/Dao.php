@@ -59,8 +59,8 @@ class Dao extends Base
 	 */
 	public function markSongPlaying($id)
 	{
-		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='playing' WHERE id=?");
-		$dbh->execute(array($id));
+		$dbh = $this->getDatabase()->prepare("UPDATE queue SET status='playing', ts_played=? WHERE id=?");
+		return $dbh->execute(array(date('Y-m-d H:i:s'), $id));
 		return true;
 	}
 

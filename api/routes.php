@@ -143,18 +143,8 @@ $app->get('/api/v1/search/:query(/:count(/:page))', function ($query, $count = 3
 	}
 });
 
-
-
-
-
-
-
-
 /**
  * Player
- */
-/**
- * (RENDER) Base music player
  */
 $app->get('/api/v1/player/next', function () {
 	$player = new Player();
@@ -182,6 +172,13 @@ $app->post('/api/v1/player/stream/validate', function () {
 	$player = new Player();
 	$player->markSong30Seconds($_POST['streamKey'], $_POST['streamServerID']);
 	ApiHandler::sendResponse(200, true);
+});
+/**
+ * Marks a song as played
+ */
+$app->post('/api/v1/song/:id/played', function ($id) use ($base) {
+	$player = new Player();
+	echo ApiHandler::sendResponse(200, $player->markSongComplete($id));
 });
 
 ?>

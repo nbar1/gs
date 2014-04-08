@@ -36,9 +36,9 @@ angular.module('gsApp')
 			return promise;
 		},
 
-		markSongPlaying: function(streamKey, streamServer) {
+		markSongComplete: function(song_id) {
 			var promise = $http({
-				url: '/api/v1/player/validate',
+				url: '/api/v1/song/' + song_id + '/played',
 				method: 'POST',
 			})
 			.then(function(response) {

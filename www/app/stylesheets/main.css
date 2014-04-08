@@ -9,10 +9,10 @@ body {
 	margin-top: 61px;
 }
 input {
-		border-color: none;
-		box-shadow: none;
-		-webkit-box-shadow: none;
-		outline: none;
+	border-color: none;
+	box-shadow: none;
+	-webkit-box-shadow: none;
+	outline: none;
 }
 
 /**
@@ -47,6 +47,22 @@ input {
 	font-weight: bold;
 	margin: 30px auto;
 	-webkit-text-stroke: 2px #fff;
+}
+#player .progress-bar-outer {
+	border: 4px solid #fff;
+	border-radius: 10px;
+	height: 20px;
+	margin: 0 auto;
+	overflow: hidden;
+	width: 600px;
+}
+#player .progress-bar-inner {
+	background: #000;
+	height: 18px;
+	transition: width 1s;
+	-moz-transition: width 1s;
+	-webkit-transition: width 1s;
+	width: 0%;
 }
 
 /**
@@ -308,7 +324,6 @@ input {
 	-webkit-animation-delay: -0.8s;
 	animation-delay: -0.8s;
 }
-
 @-webkit-keyframes stretchdelay {
 	0%, 40%, 100% {
 		-webkit-transform: scaleY(0.4)

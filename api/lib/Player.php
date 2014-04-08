@@ -32,12 +32,14 @@ class Player extends Base
 	 */
 	public function playNextSong()
 	{
+		// This will mark a song as played if for some reason it wasn't already
 		$currentPlayingSong = $this->getQueue()->getPlayingSong();
 		if ($currentPlayingSong !== false)
 		{
 			$this->markSongPlayed($currentPlayingSong['id']);
 		}
 
+		// Load up an autoplayer song if no songs queued
 		if ($this->getQueue()->getNextSong() === false && $this->config['autoplay'] === true)
 		{
 			// Get autoplay song
