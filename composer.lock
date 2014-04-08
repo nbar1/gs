@@ -3,39 +3,8 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "5c4411c5d5023137d73386f9174f8be3",
+    "hash": "490cc9d9fd8bac48ef7474cdb187af3b",
     "packages": [
-        {
-            "name": "rain/raintpl",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rainphp/raintpl3.git",
-                "reference": "5bfdf4602b8adb0e80b222fa29ac559aa9c06abf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rainphp/raintpl3/zipball/5bfdf4602b8adb0e80b222fa29ac559aa9c06abf",
-                "reference": "5bfdf4602b8adb0e80b222fa29ac559aa9c06abf",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Rain": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Federico Ulfo",
-                    "email": "rainelemental@gmail.com",
-                    "homepage": "http://github.com/rainphp"
-                }
-            ],
-            "description": "easy and fast template engine",
-            "time": "2012-12-24 05:24:32"
-        },
         {
             "name": "slim/slim",
             "version": "2.3.2",

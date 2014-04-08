@@ -1,6 +1,6 @@
 <div ng-controller='SearchBoxCtrl' id="searchbox" class="row">
 	<div class="navbar navbar-fixed-top nav col-lg-12">
-		<div class="hamburger-container" ng-class="{'show-queue-button': showQueueButton}">
+		<div class="hamburger-container" ng-class="{'show-queue-button': searchBox.showQueueButton}">
 			<a href="#/queue" class="hamburger-button">&#9835;</a>
 		</div>
 		<div class="search-container" ng-swipe-right="gotoQueue()" ng-swipe-left="gotoQueue()">

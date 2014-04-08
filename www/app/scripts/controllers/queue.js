@@ -2,9 +2,6 @@
 
 angular.module('gsApp')
 .controller('QueueCtrl', function ($scope, $rootScope, $cookies, $location, $interval, QueueModel) {
-	$rootScope.searchbox = true;
-	$rootScope.showQueueButton = false;
-	
 	// Check if user has apikey
 	if(!$cookies.gs_apikey) {
 		$location.path('/');
