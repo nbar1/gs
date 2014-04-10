@@ -1,18 +1,39 @@
 <div id="player">
 	<div class="row">
-		<div class="col-xs-12">
-			<div class="title">{{song.title}}</div>
+		<div class="col-xs-4 col-lg-2 player_queue">
+			<div ng-controller="QueueCtrl">
+				<div id="queue">
+					<div ng-repeat="song in queue" class="row-fluid item_song item_listitem {{song.priority}} {{song.status}} {{song.token}}">
+						<div class='col-xs-12'>
+							<div class='item_status'></div>
+							<div class='song_name'>{{song.title}}</div>
+							<div class='song_artist'>{{song.artist}}</div>
+							<div class='song_played_by'>{{song.played_by_name}}</div>
+
+							<span ng-show='song.status == "playing"' class='label label-info now_playing_marker'>now playing</span>
+							<span ng-show='song.priority == "high" && song.status != "playing"' class='label label-success high_priority_marker'>promoted</span>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-12">
-			<div class="artist">{{song.artist}}</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-12">
-			<div class="progress-bar-outer">
-				<div class="progress-bar-inner"></div>
+		<div class="col-xs-8 col-lg-10 player_info text-center">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="title">{{song.title}}</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="artist">{{song.artist}}</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="progress-bar-outer">
+						<div class="progress-bar-inner" style="width: {{song.positionPercent}}%;"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

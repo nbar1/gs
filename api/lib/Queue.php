@@ -15,9 +15,30 @@ class Queue extends Base
 	public function getQueue()
 	{
 		$queue = $this->getDao()->getQueue();
+		$queue = $this->purgeOldQueueData($queue);
 		for($x=0; $x<sizeof($queue); $x++)
 		{
 			$queue[$x]['played_by_name'] = $this->getUser()->getUsernameById($queue[$x]['played_by']);
+		}
+		return $queue;
+	}
+
+	/**
+	 * Purge Old Queue Data
+	 *
+	 * Removes an item marked as playing if it's been
+	 * more than 15 minutes since it was played.
+	 *
+	 * @param array $queue
+	 * @return array Modified queue
+	 */
+	public function purgeOldQueueData($queue)
+	{
+		if($queue[0]['status'] == 'playing' && date('YmdHi', strtotime($queue[0]['ts_played'])) < (date('YmdHi') - 15))
+		{
+			$player = new Player();
+			$player->markSongPlayed($queue[0]['id']);
+			array_shift($queue);
 		}
 		return $queue;
 	}
@@ -119,54 +140,6 @@ class Queue extends Base
 	{
 		$song_position = $this->getDao()->getNextQueuePosition();
 		return (!$song_position) ? 1 : ++$song_position;
-	}
-
-	/**
-	 * Send data to view
-	 *
-	 * @return string
-	 */
-	public function renderView($view = null)
-	{
-		if($this->getUser()->getUserBySession() === true)
-		{
-			$queue = $this->getQueue();
-			for($x=0; $x<sizeof($queue); $x++)
-			{
-				$queue[$x]['played_by_name'] = $this->getUser()->getNicknameById($queue[$x]['played_by']);
-			}
-
-			$this->templateEngine->assign('queue', $queue);
-			return $this->templateEngine->draw('queue');
-		}
-		else {
-			return $this->getUser()->renderView();
-		}
-	}
-
-	/**
-	 * Send data to view
-	 *
-	 * @return string
-	 */
-	public function returnQueue()
-	{
-		//if($this->getUser()->getUserBySession() === true)
-		//{
-			$queue = $this->getQueue();
-			for($x=0; $x<sizeof($queue); $x++)
-			{
-				$queue[$x]['played_by_name'] = $this->getUser()->getNicknameById($queue[$x]['played_by']);
-			}
-			
-			return $queue;
-
-			//$this->templateEngine->assign('queue', $queue);
-			//return $this->templateEngine->draw('queue');
-		//}
-		//else {
-		//	return $this->getUser()->renderView();
-		//}
 	}
 }
 ?>

@@ -11,7 +11,7 @@
 	</head>
 	<body ng-app="gsApp">
 		<div ng-show="searchBox.active"><div ng-include src="'views/searchbox.html'"></div></div>
-		<div id="content" ng-view></div>
+		<div id="content" class="{{bodyClass}}" ng-view></div>
 
 		<script src="components/jquery.min.js"></script>
 		<script src="http://code.angularjs.org/1.2.16/angular.min.js"></script>

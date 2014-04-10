@@ -40,7 +40,7 @@ class Player extends Base
 		}
 
 		// Load up an autoplayer song if no songs queued
-		if ($this->getQueue()->getNextSong() === false && $this->config['autoplay'] === true)
+		if ($this->getQueue()->getNextSong() === false && GS_AUTOPLAY === true)
 		{
 			// Get autoplay song
 			$autoplay = new Autoplay();

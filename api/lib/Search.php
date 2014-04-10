@@ -17,7 +17,7 @@ class Search extends Base
 	 */
 	public function getSearchResultsFromTinySong($query)
 	{
-		$get_url = "http://tinysong.com/s/".urlencode($query)."?format=json&limit=32&key=".$this->config['tinysong']['key'];
+		$get_url = "http://tinysong.com/s/".urlencode($query)."?format=json&limit=32&key=" . TINYSONGAPI_KEY;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $get_url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -116,15 +116,12 @@ class Search extends Base
 		{
 			error_log("RATE LIMIT: Searching for \"".$query."\" via TinySong");
 			// this wont call an error, just fallback to TinySong
-			if(isset($this->config['tinysong']['key']))
-			{
-				$results_songs = $this->getSearchResultsFromTinySong($query);
-				return array(
-					'type' => 'tinysong',
-					'artists' => null,
-					'songs' => $results_songs,
-				);
-			}
+			$results_songs = $this->getSearchResultsFromTinySong($query);
+			return array(
+				'type' => 'tinysong',
+				'artists' => null,
+				'songs' => $results_songs,
+			);
 		}
 	}
 

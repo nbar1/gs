@@ -72,7 +72,6 @@ class Song extends Base
 	 */
 	function __construct($id = null, $tokenAsId = false)
 	{
-		parent::__construct();
 		if ($id !== null)
 		{
 			($tokenAsId) ? $this->setToken($id) : $this->setId($id);

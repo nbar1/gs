@@ -1,12 +1,12 @@
 /**
  * Global
  */
-body {
-	background-position: left 25%;
-	background-size: cover;
+html, body {
+	height: 100%;
 }
 #content {
-	margin-top: 61px;
+	height: 100%;
+	padding-top: 61px;
 }
 input {
 	border-color: none;
@@ -25,36 +25,71 @@ input {
 }
 
 /**
- * Player
+ * Player Page
  */
+#content.player_page {
+	padding-top: 0;
+	overflow: hidden;
+}
 #player {
-	padding-top: 100px;
+	height: 100%;
+}
+#content > div,
+#player > .row,
+#player > .row > div {
+	height: 100%;
+}
+#player > .row > div {
+	padding-right: 0;
 }
 #player #groovesharkPlayer {
 	visibility: hidden;
 }
-#player .row {
+
+/**
+ * Player Queue
+ */
+#player .player_queue {
+	border-right: 1px solid #000;
+	overflow-y: scroll;
+}
+#player .player_queue .item_listitem {
+	min-height: 85px;
+}
+
+/**
+ * Player Info
+ */
+#player .player_info {
+	background-position: left 25%;
+	background-size: cover;
+	padding-left: 0;
 	text-align: center;
 }
+#player .player_info > .row:first-child {
+	margin-top: 25vh;
+}
 #player .title {
-	font-size: 86px;
+	font-size: 5vw;
 	font-weight: bold;
 	margin: 0 auto;
 	-webkit-text-stroke: 2px #fff;
 }
 #player .artist {
-	font-size: 64px;
+	font-size: 3vw;
 	font-weight: bold;
 	margin: 30px auto;
 	-webkit-text-stroke: 2px #fff;
 }
 #player .progress-bar-outer {
+	background: #444;
 	border: 4px solid #fff;
 	border-radius: 10px;
 	height: 20px;
+	max-width: 600px;
 	margin: 0 auto;
 	overflow: hidden;
-	width: 600px;
+	width: 30vw;
 }
 #player .progress-bar-inner {
 	background: #000;
@@ -138,6 +173,7 @@ input {
 #queue .item_listitem {
 	background: #efefef;
 	border-bottom: 1px solid #999;
+	clear: both;
 	height: auto;
 	min-height: 70px;
 	padding: 15px 0;

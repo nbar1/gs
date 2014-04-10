@@ -6,15 +6,16 @@
  * we have to catch them there and send them into
  * our Angular controller.
  */
-window.songStatus = function(status) {
-	if(status == 'failed') {
-		window.songComplete();
-	}
-}
 window.songComplete = function() {
 	var PlayerCtrl = angular.element($("#content")).scope();
 	PlayerCtrl.markSongComplete();
 	PlayerCtrl.getNextSong();
+}
+window.songStatusChange = function(status) {
+	if(status == 'failed') {
+		var PlayerCtrl = angular.element($("#content")).scope();
+		PlayerCtrl.catchStreamFailure();
+	}
 }
 window.songPosition = function(position) {
 	var PlayerCtrl = angular.element($("#content")).scope();
@@ -32,6 +33,11 @@ angular.module('gsApp')
 	 * Set template URL
 	 */
 	$scope.templateUrl = 'views/player.html';
+
+	/**
+	 * Set body class
+	 */
+	$rootScope.bodyClass = "player_page";
 
 	/**
 	 * Get Song Info
@@ -97,7 +103,7 @@ angular.module('gsApp')
 			$scope.song.streamKey = response.StreamKey;
 			$scope.song.streamServer = response.StreamServerID;
 			// Set page background to album art
-			document.body.style.backgroundImage="url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')";
+			$('.player_info').css('background-image', "url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')");
 		});
 	}
 
@@ -107,8 +113,22 @@ angular.module('gsApp')
 	 * @param object position
 	 */
 	$scope.setSongPosition = function(position) {
-		var positionPercent = ((position.position / position.duration) * 100).toFixed(0);
-		$('#player .progress-bar-inner').css('width', positionPercent + '%');
+		$scope.$apply(function() {
+			$scope.song.positionPercent = ((position.position / position.duration) * 100).toFixed(0);
+		});
+	}
+
+	/**
+	 * Catch Stream Failure
+	 *
+	 * When redirecting away, the GrooveShark player sends
+	 * a failure status, so we need to have a timeout to
+	 * check if it's a real failure or location update.
+	 */
+	$scope.catchStreamFailure = function() {
+		$timeout(function() {
+			$scope.getNextSong();
+		}, 1000);
 	}
 
 	/**
@@ -117,26 +137,28 @@ angular.module('gsApp')
 	 * This is on a timeout because 'swfobject'
 	 * acts funny and is unpredictable.
 	 */
-	$timeout(function() {
-		swfobject.embedSWF("http://grooveshark.com/APIPlayer.swf", "streamPlayer", "1", "1", "9.0.0", "", {}, {allowScriptAccess: "always"}, {id:"groovesharkPlayer", name:"groovesharkPlayer"},
-			function(e) {
-				if(e.ref) {
-					$timeout(function() {
-						window.gsplayer = e.ref;
-						window.gsplayer.setVolume(99);
-						window.gsplayer.setStatusCallback('songStatus');
-						window.gsplayer.setSongCompleteCallback('songComplete');
-						window.gsplayer.setPositionCallback('songPosition');
-					}, 1500);
+	$scope.initiatePlayer = function() {
+		$timeout(function() {
+			swfobject.embedSWF("http://grooveshark.com/APIPlayer.swf", "streamPlayer", "1", "1", "9.0.0", "", {}, {allowScriptAccess: "always"}, {id:"groovesharkPlayer", name:"groovesharkPlayer"},
+				function(e) {
+					if(e.ref) {
+						$timeout(function() {
+							window.gsplayer = e.ref;
+							window.gsplayer.setVolume(99);
+							window.gsplayer.setStatusCallback('songStatusChange');
+							window.gsplayer.setSongCompleteCallback('songComplete');
+							window.gsplayer.setPositionCallback('songPosition');
+							$scope.getNextSong();
+						}, 1500);
+					}
+					else
+					{
+						$scope.initiatePlayer();
+					}
 				}
-			}
-		);
-	}, 500);
+			);
+		}, 500);
+	}
 
-	/**
-	 * Play initital song
-	 */
-	$timeout(function() {
-		$scope.getNextSong();
-	}, 2000);
+	$scope.initiatePlayer();
 });

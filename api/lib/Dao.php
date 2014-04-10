@@ -71,7 +71,7 @@ class Dao extends Base
 	 */
 	public function getQueue()
 	{
-		$dbh = $this->getDatabase()->prepare("SELECT songs.token, songs.title, songs.artist, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by FROM queue INNER JOIN songs ON songs.token = queue.token WHERE queue.status IN('queued', 'playing') ORDER BY queue.status ASC, queue.priority ASC, queue.position ASC");
+		$dbh = $this->getDatabase()->prepare("SELECT songs.token, songs.title, songs.artist, queue.id, queue.position, queue.status, queue.priority, queue.played_by, queue.promoted_by, queue.ts_played FROM queue INNER JOIN songs ON songs.token = queue.token WHERE queue.status IN('queued', 'playing') ORDER BY queue.status ASC, queue.priority ASC, queue.position ASC");
 		$dbh->execute();
 		return $dbh->fetchAll(PDO::FETCH_ASSOC);
 	}
