@@ -63,7 +63,7 @@ input {
 #player .player_info {
 	background-position: left 25%;
 	background-size: cover;
-	padding-left: 0;
+	padding: 0 20px;
 	text-align: center;
 }
 #player .player_info > .row:first-child {
