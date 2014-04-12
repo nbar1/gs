@@ -1,8 +1,20 @@
 'use strict';
 
+/**
+ * Login Model
+ *
+ * Handles http requests for user authentication
+ */
 angular.module('gsApp')
 .factory('LoginModel', function($http) {
-	var QueueModel = {
+	var LoginModel = {
+		/**
+		 * Login
+		 *
+		 * @param username
+		 * @param password
+		 * @return promise
+		 */
 		login: function(username, password) {
 			var promise = $http({
 				url: '/api/v1/login',
@@ -15,5 +27,5 @@ angular.module('gsApp')
 			return promise;
 		}
 	};
-	return QueueModel;
+	return LoginModel;
 });

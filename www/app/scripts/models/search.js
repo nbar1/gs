@@ -1,8 +1,20 @@
 'use strict';
 
+/**
+ * Search Model
+ *
+ * Handles http requests for search
+ */
 angular.module('gsApp')
 .factory('SearchModel', function($cookies, $http) {
 	var SearchModel = {
+		/**
+		 * Do Search
+		 *
+		 * @param query
+		 * @param type
+		 * @return promise
+		 */
 		doSearch: function(query, type) {
 			var url = (type == 'artist') ? '/api/v1/search/artist/' : '/api/v1/search/';
 			url = url + query + "?apikey=" + $cookies.gs_apikey;
@@ -16,6 +28,13 @@ angular.module('gsApp')
 			return promise;
 		},
 
+		/**
+		 * Add Song To Queue
+		 *
+		 * @param song
+		 * @param promote
+		 * @return promise
+		 */
 		addSongToQueue: function(song, promote) {
 			var priority = (promote) ? 'high' : 'low';
 			var post = {

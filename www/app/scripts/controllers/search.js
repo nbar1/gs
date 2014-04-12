@@ -1,12 +1,30 @@
 'use strict';
 
+/**
+ * Search Controller
+ *
+ * Handles the searching of a query
+ */
 angular.module('gsApp')
 .controller('SearchCtrl', function ($scope, $rootScope, $cookies, $location, $routeParams, SearchModel) {
+	/**
+	 * Search Type
+	 */
 	$scope.searchType = ($routeParams.type) ? $routeParams.type : 'full';
+
+	/**
+	 * Search Query
+	 */
 	$scope.searchQuery = $routeParams.query;
 
+	/**
+	 * Search
+	 *
+	 * Searches for the defined query
+	 *
+	 * @return bool
+	 */
 	$scope.search = function() {
-		console.log('searching for ' + $scope.searchQuery);
 		SearchModel.doSearch($scope.searchQuery, $scope.searchType)
 			.then(function(data) {
 				if(data.songs.length < 1) {
@@ -27,13 +45,25 @@ angular.module('gsApp')
 				}
 			});
 	}
-	
+
+	/**
+	 * Artist Search
+	 * 
+	 * @param artist
+	 */
 	$scope.artistSearch = function(artist) {
 		if(artist.ArtistID !== undefined) {
 			$location.path('search/' + artist.ArtistID + '/artist');
 		}
 	}
-	
+
+	/**
+	 * Add Song To Queue
+	 *
+	 * @param song
+	 * @param promote
+	 * @param callback
+	 */
 	$scope.addSongToQueue = function(song, promote, callback) {
 		SearchModel.addSongToQueue(song, promote)
 			.then(function(data) {
@@ -46,6 +76,9 @@ angular.module('gsApp')
 			});
 	}
 
+	/**
+	 * Check for API key
+	 */
 	if(!$rootScope.apikey || $scope.searchQuery == undefined) {
 		$location.path('/');
 	}

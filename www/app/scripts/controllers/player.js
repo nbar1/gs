@@ -160,5 +160,14 @@ angular.module('gsApp')
 		}, 500);
 	}
 
+	/**
+	 * Destroy
+	 *
+	 * Remove body class
+	 */
+	$scope.$on('$destroy', function(){
+		$rootScope.bodyClass = undefined;
+	});
+
 	$scope.initiatePlayer();
 });

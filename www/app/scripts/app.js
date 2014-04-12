@@ -7,9 +7,15 @@ angular.module('gsApp', [
 	'ngTouch',
 ])
 .run(function($rootScope, $templateCache, $cookies) {
+	/**
+	 * View Content Loaded
+	 */
 	$rootScope.$on('$viewContentLoaded', function() {
 		$templateCache.removeAll();
 	});
+	/**
+	 * Route Change Success
+	 */
 	$rootScope.$on("$routeChangeSuccess", function(e, route) {
 		// Set up SearchBox
 		$rootScope.searchBox = {
@@ -22,18 +28,20 @@ angular.module('gsApp', [
 		}
 		
 		// Check for API Key in cookie
-		if($cookies.gs_apikey !== undefined) {
+		if($cookies.gs_apikey != undefined) {
 			$rootScope.apikey = $cookies.gs_apikey;
 		}
 	});
 })
 .config(function($routeProvider) {
+	/**
+	 * Routes
+	 */
 	$routeProvider
+		/**
+		 * Queue page
+		 */
 		.when('/', {
-			templateUrl: 'views/login.html',
-			controller: 'LoginCtrl'
-		})
-		.when('/queue', {
 			template: '<div ng-hide="queue || errorMessage" loader></div><div ng-include="templateUrl"></div>',
 			controller: 'QueueCtrl',
 			searchBox: {
@@ -41,6 +49,19 @@ angular.module('gsApp', [
 				showQueueButton: false
 			}
 		})
+		/**
+		 * Login page
+		 */
+		.when('/login', {
+			templateUrl: 'views/login.html',
+			controller: 'LoginCtrl'
+		})
+		/**
+		 * Search page
+		 *
+		 * @param query
+		 * @param type [optional]
+		 */
 		.when('/search/:query/:type?', {
 			template: '<div ng-hide="songs || errorMessage" loader></div><div ng-include="templateUrl"></div>',
 			controller: 'SearchCtrl',
@@ -49,10 +70,16 @@ angular.module('gsApp', [
 				showQueueButton: true
 			}
 		})
+		/**
+		 * Player page
+		 */
 		.when('/player', {
 			template: '<div ng-hide="song || errorMessage" loader></div><div ng-include="templateUrl"></div>',
 			controller: 'PlayerCtrl'
 		})
+		/**
+		 * Redirect to queue
+		 */
 		.otherwise({
 			redirectTo: '/'
 		});
