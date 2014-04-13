@@ -29,7 +29,6 @@ $app->post('/api/v1/queue/add/', function () use ($base) {
 	if(ApiHandler::validKey())
 	{
 		$song_info = $base->getSong()->getSongInformationFromGrooveShark($_POST['songID']);
-		var_dump($song_info);
 		$base->getSong()->setSongInformation(
 			$song_info['SongID'],
 			$song_info['SongName'],

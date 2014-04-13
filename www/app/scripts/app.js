@@ -5,6 +5,7 @@ angular.module('gsApp', [
 	'ngResource',
 	'ngRoute',
 	'ngTouch',
+	'ui.slider',
 ])
 .run(function($rootScope, $templateCache, $cookies) {
 	/**

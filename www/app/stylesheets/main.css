@@ -101,6 +101,34 @@ input {
 }
 
 /**
+ * Player Options
+ */
+#player-options {
+	background: rgba(30, 30, 30, 0.5);
+	bottom: 0;
+	height: 51px;
+	position: absolute;
+	right: 0;
+	width: 100%;
+}
+#volume-control {
+	margin: 20px auto 0;
+	width: 400px;
+}
+#volume-control > div {
+	background: #444;
+}
+#volume-control .ui-slider-handle {
+	background: #000;
+	border-radius: 10px;
+	cursor: pointer;
+	outline: none;
+}
+#volume-control .ui-slider-range {
+	background: #222;
+}
+
+/**
  * Login
  */
 #login #login_button {

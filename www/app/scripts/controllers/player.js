@@ -40,6 +40,11 @@ angular.module('gsApp')
 	$rootScope.bodyClass = "player_page";
 
 	/**
+	 * Set Volume
+	 */
+	$scope.volume = 100;
+
+	/**
 	 * Get Song Info
 	 *
 	 * @param token
@@ -144,7 +149,7 @@ angular.module('gsApp')
 					if(e.ref) {
 						$timeout(function() {
 							window.gsplayer = e.ref;
-							window.gsplayer.setVolume(99);
+							$scope.volume = 100;
 							window.gsplayer.setStatusCallback('songStatusChange');
 							window.gsplayer.setSongCompleteCallback('songComplete');
 							window.gsplayer.setPositionCallback('songPosition');
@@ -159,6 +164,15 @@ angular.module('gsApp')
 			);
 		}, 500);
 	}
+
+	/**
+	 * Watch Volume Control
+	 */
+	$scope.$watch("volume", function() {
+		if(window.gsplayer) {
+			window.gsplayer.setVolume($scope.volume);
+		}
+	}, true);
 
 	/**
 	 * Destroy

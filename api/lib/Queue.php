@@ -15,7 +15,10 @@ class Queue extends Base
 	public function getQueue()
 	{
 		$queue = $this->getDao()->getQueue();
-		$queue = $this->purgeOldQueueData($queue);
+		if(isset($queue[0]))
+		{
+			$queue = $this->purgeOldQueueData($queue);
+		}
 		for($x=0; $x<sizeof($queue); $x++)
 		{
 			$queue[$x]['played_by_name'] = $this->getUser()->getUsernameById($queue[$x]['played_by']);

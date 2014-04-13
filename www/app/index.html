@@ -6,14 +6,16 @@
 		<title>GrooveShrimp</title>
 		<meta name="description" content="">
 		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-		<link rel="stylesheet" href="components/bootstrap.min.css">
-		<link rel="stylesheet" href="stylesheets/main.css">
+		<link rel="stylesheet" href="components/bootstrap.min.css" />
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+		<link rel="stylesheet" href="stylesheets/main.css" />
 	</head>
 	<body ng-app="gsApp">
 		<div ng-show="searchBox.active"><div ng-include src="'views/searchbox.html'"></div></div>
 		<div id="content" class="{{bodyClass}}" ng-view></div>
 
-		<script src="components/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 		<script src="http://code.angularjs.org/1.2.16/angular.min.js"></script>
 		<script src="components/bootstrap.min.js"></script>
 		<script src="http://code.angularjs.org/1.2.16/angular-resource.min.js"></script>
@@ -22,6 +24,7 @@
 		<script src="http://code.angularjs.org/1.2.16/angular-route.min.js"></script>
 		<script src="http://code.angularjs.org/1.2.16/angular-touch.min.js"></script>
 		<script src="components/swfobject.js"></script>
+		<script src="components/ui-slider.js"></script>
 
 		<script src="scripts/app.js"></script>
 
@@ -38,5 +41,7 @@
 
 		<script src="scripts/directives/song-item.js"></script>
 		<script src="scripts/directives/loader.js"></script>
+		<script src="scripts/directives/player-options.js"></script>
+		<script src="scripts/directives/volume-control.js"></script>
 	</body>
 </html>
