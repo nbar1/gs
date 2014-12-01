@@ -1,13 +1,21 @@
 <div id="queue">
-	<div ng-repeat="song in queue" class="row-fluid item_song item_listitem {{song.priority}} {{song.status}} {{song.token}}">
-		<div class='col-lg-12'>
-			<div class='item_status'></div>
-			<div class='song_name'>{{song.title}}</div>
-			<div class='song_artist'>{{song.artist}}</div>
-			<div class='song_played_by'>{{song.played_by_name}}</div>
+	<div ng-show="!queue.length">
+		<div class='col-lg-12 gs-messaging'>
+			<h3 class="gs-messaging">Queue Empty</h3>
+			<p>Search to add a song to the queue.</p>
+		</div>
+	</div>
+	<div ng-show="queue.length" ng-repeat="song in queue" class="material row-fluid item-song item-listitem {{song.priority}} {{song.status}} {{song.token}}">
+		<div ng-show='song.status == "playing" || song.priority == "high"' class='col-lg-12 song-status'>
+			<span ng-show='song.status == "playing"' class="card-title now-playing">Now Playing</span>
+			<span ng-show='song.priority == "high" && song.status != "playing"' class="card-title promoted">Promoted</span>
+		</div>
+		<div class='col-lg-12 song-info'>
+			<div class='item-status'></div>
+			<div class='song-name'>{{song.title}}</div>
+			<div class='song-artist'>{{song.artist}}</div>
+			<div class='song-played_by'>{{song.played_by_name}}</div>
 	
-			<span ng-show='song.status == "playing"' class='label label-info now_playing_marker'>now playing</span>
-			<span ng-show='song.priority == "high" && song.status != "playing"' class='label label-success high_priority_marker'>promoted</span>
 		</div>
 	</div>
 </div>

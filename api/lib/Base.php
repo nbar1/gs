@@ -161,7 +161,7 @@ class Base
 		else {
 			$_SESSION['gsCountry'] = $this->getGsAPI()->getCountry();
 		}
-		$this->getGsAPI()->authenticate(GROOVESHARK_USERNAME, GROOVESHARK_PASSWORD);
+		$this->getGsAPI()->authenticateToken(GROOVESHARK_TOKEN);
 	}
 }
 ?>

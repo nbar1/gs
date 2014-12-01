@@ -13,6 +13,7 @@ angular.module('gsApp')
 	$scope.getQueue = function() {
 		QueueModel.getQueue().success(function(response, status) {
 			$scope.queue = response.queue;
+			$scope.queueLoaded = true;
 			$scope.templateUrl = 'views/queue.html';
 		});
 	}

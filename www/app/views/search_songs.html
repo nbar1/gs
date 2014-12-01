@@ -1,5 +1,5 @@
 <div id="search">
-	<div ng-repeat="song in songs" class="row item_song item_listitem" rel="{{song.SongID}}" ng-class="{'show-options': showOptions}" ng-swipe-left="showOptions=true" ng-swipe-right="showOptions=false" ng-click="showOptions = !showOptions">
+	<div ng-repeat="song in songs" class="item-song item-listitem" rel="{{song.SongID}}">
 		<div song-item></div>
 	</div>
 </div>

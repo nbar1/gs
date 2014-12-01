@@ -1,32 +1,24 @@
 <?php
-
 /**
  * Grooveshark API Class
  * @author James Hartig
  * @copyright 2013
  * Released under GNU General Public License v3
  */
-
 class gsAPI {
-
     /**
      * Your key and secret will be provided by Grooveshark. Fill them in below or pass them to the constructor.
      */
     private static $wsKey = "example";
     private static $wsSecret = "1a79a4d60de6718e8e5b326e338ae533";
-
     const API_HOST = "api.grooveshark.com";
     const API_ENDPOINT = "/ws3.php";
-
     private static $instance;
-
     public static $usePHPDNS = false; //if curl dns resolution is failing, set this to true and we will do dns lookup in php
     private static $cachedHostIP;
-
     public $sessionID = null;
     public $country;
     public static $headers;
-
     function __construct($key = null, $secret = null, $sessionID = null, $country = null)
     {
         if (!empty($key)) {
@@ -45,9 +37,7 @@ class gsAPI {
         if (empty(self::$wsKey) || empty(self::$wsSecret)) {
             trigger_error("gsAPI class requires a valid key and secret.", E_USER_ERROR);
         }
-
         self::$instance = $this;
-        self::$headers = array();        
     }
     
     public static function getInstance($key = null, $secret = null, $sessionID = null, $country = null)
@@ -66,12 +56,10 @@ class gsAPI {
     {
         return self::makeCall('pingService', array());
     }
-
     /**
      * Methods related specifically to sessions
      * Calls require special access.
      */
-
     /*
      * Start a new session
      * This will save the session as a static variable on the gsAPI class to simplify other methods
@@ -85,7 +73,6 @@ class gsAPI {
         $this->sessionID = $result;
         return $result;
     }
-
     /*
      * Set the current session for use with methods
     */
@@ -93,7 +80,6 @@ class gsAPI {
     {
        $this->sessionID = $sessionID;
     }
-
     /*
      * Returns the current SessionID
      * This should be stored instead of username/token
@@ -103,7 +89,6 @@ class gsAPI {
     {
        return $this->sessionID;
     }
-
     /*
      * Logs out any authenticated user from the current session
      * This requires a valid sessionID, either statically or as a parameter
@@ -117,7 +102,6 @@ class gsAPI {
         if (empty($sessionID)) {
             $sessionID = $this->sessionID;
         }
-
         $result = self::makeCall('logout', array(), 'success', false, $sessionID);
         if (empty($result)) {
             return false;
@@ -130,7 +114,6 @@ class gsAPI {
     {
         return $this->logout();
     }
-
     /*
     * Returns information about the logged-in user based on the current sessionID
     */
@@ -138,7 +121,6 @@ class gsAPI {
     {
         return self::makeCall('getUserInfo', array(), null, false, $this->sessionID);
     }
-
     /*
      * Set the current country for use with methods
     */
@@ -146,7 +128,6 @@ class gsAPI {
     {
        $this->country = $country;
     }
-
     /*
      * Returns a country object for the given IP.
      * This should be cached since it won't change.
@@ -171,37 +152,59 @@ class gsAPI {
         }
         return $country;
     }
-
     /**
      * Methods relating to the logged-in user
      * Calls require session access.
      */
-
+    /*
+     * Shim for authenticateEx
+     */
+    public function authenticate($username, $password)
+    {
+        return $this->authenticateEx($username, $password);
+    }
     /*
      * Authenticate a user
      * Username can be the user's email or username.
      * Password should be sent unmodified to this method.
      */
-    public function authenticate($username, $password)
+    public function authenticateEx($username, $password)
     {
         if (empty($username) || empty($password)) {
             return array();
         }
         $args = array('login' => $username,
-                      'password' => md5($password),
-                      );
-        $result = self::makeCall('authenticate', $args, null, true, $this->sessionID);
+                      'password' => $password,
+        );
+        $result = self::makeCall('authenticateEx', $args, null, true, $this->sessionID);
         if (empty($result['UserID'])) {
             return array();
         }
         return $result;
     }
-    //backwards-compatible
+    /*
+     * Authenticate a user
+     * Username can be the user's email or username.
+     * Password should be sent unmodified to this method.
+     */
+    public function authenticateToken($token)
+    {
+        if (empty($token)) {
+            return array();
+        }
+        $args = array('token' => $token,
+                      );
+        $result = self::makeCall('authenticateToken', $args, null, true, $this->sessionID);
+        if (empty($result['UserID'])) {
+            return array();
+        }
+        return $result;
+    }
+    //backwards-compatible (expects a hashed password)
     public function login($username, $password)
     {
-        return $this->authenticate($username, $password);
+        throw new Exception("Deprecated! Use authenticate instead");
     }
-
     /*
      * Get the logged-in user's playlists
      * Requires a valid sessionID and authenticated user
@@ -214,7 +217,6 @@ class gsAPI {
         }
         return self::makeCall('getUserPlaylists', $args, 'playlists', false, $this->sessionID);
     }
-
     /*
      * Returns the playlists owned by the given userID
      */
@@ -227,7 +229,6 @@ class gsAPI {
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -235,7 +236,6 @@ class gsAPI {
         }
         return self::makeCall('getUserPlaylistsByUserID', $args, 'playlists', false, $sessionID);
     }
-
     /*
      * Get the logged-in user's library
      * Requires a valid sessionID and authenticated user
@@ -253,7 +253,6 @@ class gsAPI {
     {
         return self::getUserLibrary($limit);
     }
-
     /*
      * Get the logged-in user's favorites
      * Requires a valid sessionID and authenticated user
@@ -271,7 +270,6 @@ class gsAPI {
     {
         return self::getUserFavoriteSongs($limit);
     }
-
     /*
      * Adds a song to the logged-in user's favorites
      * Requires a valid sessionID and authenticated user
@@ -281,10 +279,8 @@ class gsAPI {
         if (!is_numeric($songID)) {
             return false;
         }
-
         return self::makeCall('addUserFavoriteSong', array('songID' => (int)$songID), 'success', false, $this->sessionID);
     }
-
     /*
      * Adds a song to the logged-in user's library
      * Requires a valid sessionID and authenticated user
@@ -295,10 +291,8 @@ class gsAPI {
         if (!is_array($songs)) {
             return false;
         }
-
         return self::makeCall('addUserLibrarySongsEx', array('songs' => $songs), 'success', false, $this->sessionID);
     }
-
     /*
      * Creates a playlist for the logged-in user
      */
@@ -315,7 +309,6 @@ class gsAPI {
                       );
         return self::makeCall('createPlaylist', $args, null, false, $this->sessionID);
     }
-
     /*
      * Adds a song to the end of a playlist
      */
@@ -324,17 +317,18 @@ class gsAPI {
         if (!is_numeric($playlistID) || !is_numeric($songID)){
             return false;
         }
-
         //first we need to retrieve playlist songs then we need to set playlist songs
         $songs = self::getPlaylistSongs($playlistID);
         if (!is_array($songs)) {
             return false; //we couldn't process the songs, look for getPlaylistSongs to return error
         }
-        $songs[] = $songID;
-
-        return self::setPlaylistSongs($playlistID, $songs, null, false, $this->sessionID);
+        $songIDs = array();
+        foreach ($songs as $song) {
+            $songIDs[] = (int)$song['SongID'];
+        }
+        $songIDs[] = $songID;
+        return self::setPlaylistSongs($playlistID, $songIDs);
     }
-
     /*
      * Changes a playlist's songs owned by the logged-in user
      * returns array('success' => boolean)
@@ -344,17 +338,14 @@ class gsAPI {
         if (!is_numeric($playlistID) || !is_array($songIDs)){
             return array('success' => false);
         }
-
         $args = array('playlistID' => (int)$playlistID,
                       'songIDs' => $songIDs,
                       );
         return self::makeCall('setPlaylistSongs', $args, null, false, $this->sessionID);
     }
-
     /**
      * Methods relating to artists/albums/songs
      */
-
     /*
      * Retrieves information for the given artistID
      * Can be called statically or dynamically
@@ -364,7 +355,6 @@ class gsAPI {
         if (empty($artistID)){
             return false;
         }
-
         if (isset($this)) {
             $result = $this->getArtistsInfo(array($artistID));
         } else {
@@ -376,7 +366,6 @@ class gsAPI {
         }
         return $result[0];
     }
-
     /*
      * Retrieves information for the given artistIDs
      * Note: not guaranteed to come back in the same order
@@ -390,7 +379,6 @@ class gsAPI {
         if (!is_array($artistIDs)) {
             $artistIDs = array($artistIDs);
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -408,7 +396,6 @@ class gsAPI {
         }
         return $result;
     }
-
     /*
      * Returns a songID from the Tinysong Base62
      * Requires special access.
@@ -419,7 +406,6 @@ class gsAPI {
         if (!preg_match("/^[A-Za-z0-9]+$/", $base)) {
             return false;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -427,7 +413,6 @@ class gsAPI {
         }
         return self::makeCall('getSongIDFromTinysongBase62', array('base62' => $base), 'songID', false, $sessionID);
     }
-
     /*
      * Returns the Grooveshark URL for a Tinysong Base62
      * Requires special access.
@@ -438,7 +423,6 @@ class gsAPI {
         if (!preg_match("/^[A-Za-z0-9]+$/", $base)) {
             return false;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -446,7 +430,6 @@ class gsAPI {
         }
         return self::makeCall('getSongURLFromTinysongBase62',array('base62' => $base), 'url', false, $sessionID);
     }
-
     /*
      * Returns a Grooveshark URL for the given SongID
      * Requires special access.
@@ -457,7 +440,6 @@ class gsAPI {
         if (!is_numeric($songID)){
             return false;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -465,23 +447,20 @@ class gsAPI {
         }
         return self::makeCall('getSongURLFromSongID', array('songID' => (int)$songID), 'url', false, $sessionID);
     }
-
     /*
     * Returns metadata about the given songID
     */
-    public function getSongInfo($songID)
+    public static function getSongInfo($songID)
     {
         if (!is_numeric($songID)) {
             return array();
         }
-
         $result = self::getSongsInfo(array($songID));
         if (empty($result)) {
             return $result;
         }
         return $result[0];
     }
-
     /*
      * Returns metadata about multiple songIDs
      * Note: not guaranteed to come back in the same order
@@ -495,7 +474,6 @@ class gsAPI {
         if (!is_array($songIDs)) {
             $songIDs = array($songIDs);
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -516,7 +494,6 @@ class gsAPI {
         }
         return $result;
     }
-
     /*
      * Returns metadata about the given albumID
      */
@@ -525,7 +502,6 @@ class gsAPI {
         if (!is_numeric($albumID)) {
             return array();
         }
-
         if (isset($this)) {
             $result = $this->getAlbumsInfo(array($albumID));
         } else {
@@ -536,7 +512,6 @@ class gsAPI {
         }
         return $result[0];
     }
-
     /*
      * Returns metadata about multiple albumIDs
      * Note: not guaranteed to come back in the same order
@@ -550,7 +525,6 @@ class gsAPI {
         if (!is_array($albumIDs)) {
             $albumIDs = array($albumIDs);
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -571,7 +545,6 @@ class gsAPI {
         }
         return $result;
     }
-
     /*
      * Get songs on a given albumID
      */
@@ -580,12 +553,10 @@ class gsAPI {
         if (!is_numeric($albumID)) {
             return array();
         }
-
         $args = array('albumID' => (int)$albumID);
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -593,7 +564,6 @@ class gsAPI {
         }
         return self::makeCall('getAlbumSongs', $args, 'songs', false, $sessionID);
     }
-
     /*
      * Get songs on a given playlistID
      */
@@ -602,12 +572,10 @@ class gsAPI {
         if (!is_numeric($playlistID)) {
             return array();
         }
-
         $args = array('playlistID' => (int)$playlistID);
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -615,7 +583,6 @@ class gsAPI {
         }
         return self::makeCall('getPlaylistSongs', $args, 'songs', false, $sessionID);
     }
-
     /*
      * Returns whether a given songID exists or not.
      * Returns array('exists' => boolean)
@@ -626,7 +593,6 @@ class gsAPI {
         if (!is_numeric($songID)) {
             return $return;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -638,7 +604,6 @@ class gsAPI {
         }
         return $return;
     }
-
     /*
      * Returns whether a given artistID exists or not.
      * Returns array('exists' => boolean)
@@ -649,7 +614,6 @@ class gsAPI {
         if (!is_numeric($artistID)) {
             return $return;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -661,7 +625,6 @@ class gsAPI {
         }
         return $return;
     }
-
     /*
      * Returns whether a given albumID exists or not.
      * Returns array('exists' => boolean)
@@ -672,7 +635,6 @@ class gsAPI {
         if (!is_numeric($albumID)) {
             return $return;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -684,7 +646,6 @@ class gsAPI {
         }
         return $return;
     }
-
     /*
      * Returns a list of an artistID's albums
      * Optionally allows you to get only the verified albums
@@ -694,13 +655,11 @@ class gsAPI {
         if (!is_numeric($artistID)){
             return false;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
             $sessionID = $this->sessionID;
         }
-
         $args = array('artistID' => (int)$artistID);
         if ($verified) {
             $result = self::makeCall('getArtistVerifiedAlbums', $args, 'albums', false, $sessionID);
@@ -709,7 +668,6 @@ class gsAPI {
         }
         return $result;
     }
-
     /*
      * Alias class for getArtistAlbums with verified true
      */
@@ -721,7 +679,6 @@ class gsAPI {
             return self::getArtistAlbums($artistID, true);
         }
     }
-
     /*
      * Returns the top 100 songs for an artistID
      */
@@ -730,7 +687,6 @@ class gsAPI {
         if (!is_numeric($artistID)){
             return false;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -738,7 +694,6 @@ class gsAPI {
         }
         return self::makeCall('getArtistPopularSongs', array('artistID' => (int)$artistID), 'songs', false, $sessionID);
     }
-
     /*
      * Returns a list of today's popular songs
      */
@@ -748,7 +703,6 @@ class gsAPI {
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -756,7 +710,6 @@ class gsAPI {
         }
         return self::makeCall('getPopularSongsToday', $args, 'songs', false, $sessionID);
     }
-
     /*
      * Returns a list of today's popular songs
      */
@@ -766,7 +719,6 @@ class gsAPI {
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -774,7 +726,6 @@ class gsAPI {
         }
         return self::makeCall('getPopularSongsMonth', $args, 'songs', false, $sessionID);
     }
-
     /*
      * Get search results for a song
      * This method is access controlled.
@@ -792,7 +743,6 @@ class gsAPI {
         if (empty($country)) {
             $country = $this->country;
         }
-
         $args = array('query' => $query,
                       'country' => $country,
                       );
@@ -810,7 +760,6 @@ class gsAPI {
                 $args['offset'] = $offset;
             }
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -818,7 +767,6 @@ class gsAPI {
         }
         return self::makeCall('getSongSearchResults', $args, 'songs', false, $sessionID);
     }
-
     /*
      * Get search results for an artist name
      * This method is access controlled.
@@ -828,12 +776,10 @@ class gsAPI {
         if (empty($query)){
             return array();
         }
-
         $args = array('query' => $query);
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -841,7 +787,6 @@ class gsAPI {
         }
         return self::makeCall('getArtistSearchResults', $args, 'artists', false, $sessionID);
     }
-
     /*
      * Get search results for an album name
      * This method is access controlled.
@@ -851,12 +796,10 @@ class gsAPI {
         if (empty($query)){
             return array();
         }
-
         $args = array('query' => $query);
         if (!empty($limit)) {
             $args['limit'] = (int)$limit;
         }
-
         //todo: remove this once we everything is forced dynamically
         $sessionID = false;
         if (isset($this) && !empty($this->sessionID)) {
@@ -864,7 +807,6 @@ class gsAPI {
         }
         return self::makeCall('getAlbumSearchResults', $args, 'albums', false, $sessionID);
     }
-
     /*
      * Get a stream mp3 url for a given songID. This can be used to stream the song once to an mp3-compatible player.
      * This method is access controlled.
@@ -892,7 +834,6 @@ class gsAPI {
         $result['StreamServerHostname'] = $serverURL['host'];
         return $result;
     }
-
     /*
      * Get a stream mp3 url for a given songID. This can be used to stream the song once to an mp3-compatible player.
      * Anywhere-only or trials
@@ -925,7 +866,6 @@ class gsAPI {
         $result['StreamServerHostname'] = $serverURL['host'];
         return $result;
     }
-
     /*
      * Mark an existing streamKey/streamServerID as being played for >30 seconds
      * This should be called after 30 seconds of listening, not just at the 30 seconds mark.
@@ -941,8 +881,6 @@ class gsAPI {
                       );
         return self::makeCall('markStreamKeyOver30Secs', $args, null, false, $this->sessionID);
     }
-
-
     /*
      * Marks an song stream as completed
      * Complete is defined as: Played for greater than or equal to 30 seconds, and having reached the last second either through seeking or normal playback.
@@ -965,24 +903,20 @@ class gsAPI {
      * Make a call to the Grooveshark API
      */
     public static function makeCall($method, $args = array(), $resultKey = null, $https = false, $sessionID = false){
-
         $payload = array('method' => $method,
                          'parameters' => $args,
-                         'header' => array('wsKey' => self::$wsKey),
+                         'header' => array('wsKey' => self::$wsKey, 'sessionID' => $_SESSION['gsSession']),
                          );
-
         if (!empty($sessionID)) {
             $payload['header']['sessionID'] = $sessionID;
         } else if ($sessionID !== false) {
             trigger_error("$method requires a valid sessionID.", E_USER_ERROR);
             return false;
         }
-
         $c = curl_init();
         $postData = json_encode($payload);
         curl_setopt($c, CURLOPT_POST, 1);
         curl_setopt($c, CURLOPT_POSTFIELDS, $postData);
-
         $headers = self::$headers;
         $host = self::API_HOST;
         if (self::$usePHPDNS) {
@@ -1000,7 +934,6 @@ class gsAPI {
         if (!empty($headers)) {
             curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
         }
-
         if ($https) {
             $scheme = "https://";
         } else {
@@ -1009,10 +942,12 @@ class gsAPI {
         $sig = self::createMessageSig($postData, self::$wsSecret);
         $url = $scheme . $host . self::API_ENDPOINT . "?sig=$sig";
         curl_setopt($c, CURLOPT_URL, $url);
-
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
         curl_setopt($c, CURLOPT_TIMEOUT, 6);
+        if (self::$usePHPDNS) {
+            curl_setopt($c, CURLOPT_SSL_VERIFYHOST, 0); //need to use this since were changing the IP
+        }
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($c, CURLOPT_USERAGENT, 'fastest963-GroovesharkAPI-PHP-' . self::$wsKey);
         $return = curl_exec($c);
@@ -1022,7 +957,6 @@ class gsAPI {
             trigger_error("Unexpected return code from Grooveshark API. Code $httpCode.", E_USER_ERROR);
             return false;
         }
-
         $result = json_decode($return, true);
         if (is_null($result) || empty($result['result'])) {
             if (!empty($result['errors'])) {
@@ -1046,7 +980,6 @@ class gsAPI {
     private static function createMessageSig($params, $secret){
         return hash_hmac('md5', $params, $secret);
     }
-
     /*
      * Add X-Client-IP to all requests
      * Whitelisted API keys only
@@ -1070,4 +1003,8 @@ class gsAPI {
     }
     
 }
+//set down here since we can't do it in constructor or statically
+gsAPI::$headers = array('Expect:', //prevent Expect: 100-continue from being sent (http://us3.php.net/manual/en/function.curl-setopt.php#82418)
+                        'Content-Type: application/json', //don't allow endpoint to think we sent form-encoded
+                        );
 ?>

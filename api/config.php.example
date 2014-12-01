@@ -12,8 +12,7 @@ define('GSAPI_SECRET', '');
 
 define('TINYSONGAPI_KEY', '');
 
-define('GROOVESHARK_USERNAME', '');
-define('GROOVESHARK_PASSWORD', '');
+define('GROOVESHARK_TOKEN', '');
 
 define('GS_AUTOPLAY', TRUE);
 define('GS_PROMOTION_MAX', 3);

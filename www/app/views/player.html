@@ -1,23 +1,24 @@
 <div id="player">
 	<div class="row">
-		<div class="col-xs-4 col-lg-2 player_queue">
+		<div class="col-xs-4 col-lg-2 player-queue">
 			<div ng-controller="QueueCtrl">
 				<div id="queue">
-					<div ng-repeat="song in queue" class="row-fluid item_song item_listitem {{song.priority}} {{song.status}} {{song.token}}">
-						<div class='col-xs-12'>
-							<div class='item_status'></div>
-							<div class='song_name'>{{song.title}}</div>
-							<div class='song_artist'>{{song.artist}}</div>
-							<div class='song_played_by'>{{song.played_by_name}}</div>
-
-							<span ng-show='song.status == "playing"' class='label label-info now_playing_marker'>now playing</span>
-							<span ng-show='song.priority == "high" && song.status != "playing"' class='label label-success high_priority_marker'>promoted</span>
+					<div ng-repeat="song in queue" class="row-fluid item-song item-listitem {{song.priority}} {{song.status}} {{song.token}}">
+						<div ng-show='song.status == "playing" || song.priority == "high"' class='col-lg-12 song-status'>
+							<span ng-show='song.status == "playing"' class="card-title now-playing">Now Playing</span>
+							<span ng-show='song.priority == "high" && song.status != "playing"' class="card-title promoted">Promoted</span>
+						</div>
+						<div class='col-xs-12 song-info'>
+							<div class='item-status'></div>
+							<div class='song-name'>{{song.title}}</div>
+							<div class='song-artist'>{{song.artist}}</div>
+							<div class='song-played_by'>{{song.played_by_name}}</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-xs-8 col-lg-10 player_info text-center">
+		<div class="col-xs-8 col-lg-10 player-info text-center">
 			<div class="row">
 				<div class="col-xs-12">
 					<div class="title">{{song.title}}</div>

@@ -37,7 +37,7 @@ angular.module('gsApp')
 	/**
 	 * Set body class
 	 */
-	$rootScope.bodyClass = "player_page";
+	$rootScope.bodyClass = "player-page";
 
 	/**
 	 * Set Volume
@@ -108,7 +108,7 @@ angular.module('gsApp')
 			$scope.song.streamKey = response.StreamKey;
 			$scope.song.streamServer = response.StreamServerID;
 			// Set page background to album art
-			$('.player_info').css('background-image', "url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')");
+			$('.player-info').css('background-image', "url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')");
 		});
 	}
 

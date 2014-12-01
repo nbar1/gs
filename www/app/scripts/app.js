@@ -43,7 +43,7 @@ angular.module('gsApp', [
 		 * Queue page
 		 */
 		.when('/', {
-			template: '<div ng-hide="queue || errorMessage" loader></div><div ng-include="templateUrl"></div>',
+			template: '<div ng-hide="queueLoaded || errorMessage" loader></div><div ng-include="templateUrl"></div>',
 			controller: 'QueueCtrl',
 			searchBox: {
 				active: true,
