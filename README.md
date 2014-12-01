@@ -28,3 +28,14 @@ You can obtain a GrooveShark Anywhere account at [grooveshark.com](http://groove
 Beyond basic GrooveShark Public API v3 access, you should have access to the following methods:
 * startAutoplay
 * getSubscriberStreamKey
+
+# Application
+
+## Queue
+![Image of Queue](https://raw.githubusercontent.com/nbar1/gs/master/github-resources/images/queue.png)
+
+## Search
+![Image of Queue](https://raw.githubusercontent.com/nbar1/gs/master/github-resources/images/search.png)
+
+## Player
+![Image of Queue](https://raw.githubusercontent.com/nbar1/gs/master/github-resources/images/player.png)
