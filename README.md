@@ -1,9 +1,19 @@
 # GrooveShrimp
 
-A party mode playlist that interfaces with GrooveShark
+A party mode playlist that interfaces with GrooveShark.
+
+## Features
+
+* Unlimited end-users adding songs to central queue
+* Ability for users to promote a song to the top of the queue (rate-limit configurable)
+* TinySong API fallback when GrooveShark Search API rate-limit is reached (excludes artist search)
+* App-specific volume control from player page
+* Configurable autoplayer that will play a song that is similar to the last 10 user-played songs when the queue is empty
 
 ## Notes
-The current version is based on AngularJS and a RESTful back-end.
+* The current version is based on AngularJS and a REST back-end utilizing Slim-PHP.
+* Music playback requires a flash compatible browser. Mobile end-user interface does not require flash.
+
 
 ## Installation
 
