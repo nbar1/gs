@@ -903,9 +903,10 @@ class gsAPI {
      * Make a call to the Grooveshark API
      */
     public static function makeCall($method, $args = array(), $resultKey = null, $https = false, $sessionID = false){
+	    $sessionID = (isset($_SESSION['gsSession'])) ? $_SESSION['gsSession'] : false;
         $payload = array('method' => $method,
                          'parameters' => $args,
-                         'header' => array('wsKey' => self::$wsKey, 'sessionID' => $_SESSION['gsSession']),
+                         'header' => array('wsKey' => self::$wsKey/*, 'sessionID' => $_SESSION['gsSession']*/),
                          );
         if (!empty($sessionID)) {
             $payload['header']['sessionID'] = $sessionID;

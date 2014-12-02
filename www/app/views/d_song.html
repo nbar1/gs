@@ -8,11 +8,7 @@
 	</div>
 	<div class='col-xs-2 song-status' ng-class="{'show-loading': showLoading==true}" loader></div>
 </div>
-<div class="row">
-	<div class='col-xs-6'>
-		<button class='btn btn-warning' ng-click="addSong(song, true)">promote</button>
-	</div>
-	<div class='col-xs-6'>
-		<button class='btn btn-success' ng-click="addSong(song, false)">add to queue</button>
-	</div>
+<div class="song-btn-container">
+	<button class='btn btn-warning song-btn song-btn-promote' ng-click="addSong(song, true)"><i class="fa fa-star"></i></button>
+	<button class='btn btn-success song-btn song-btn-add' ng-click="addSong(song, false)"><i class="fa">+</i></button>
 </div>

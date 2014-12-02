@@ -36,6 +36,7 @@ angular.module('gsApp')
 						$scope.artists = data.artists;
 					}
 					$scope.songs = data.songs;
+					$scope.userPromotions = data.userPromotions;
 					return true;
 				}
 				else {

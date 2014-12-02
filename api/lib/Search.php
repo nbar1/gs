@@ -100,13 +100,14 @@ class Search extends Base
 	 * @param int $page Page number
 	 * @return array
 	 */
-	public function doSearch($query, $count=30, $page=1)
+	public function doSearch($query, $count=30, $page=1, User $user)
 	{
 		try
 		{
 			$results_artists = $this->parseArtistResultsForRelevantArtist($query, $this->getArtistSearchResults($query));
 			$results_songs = $this->getSongSearchResults($query, $count, $page);
 			return array(
+				'userPromotions' => $user->getAvailablePromotions(),
 				'type' => 'full',
 				'artists' => $results_artists,
 				'songs' => $results_songs,
@@ -118,6 +119,7 @@ class Search extends Base
 			// this wont call an error, just fallback to TinySong
 			$results_songs = $this->getSearchResultsFromTinySong($query);
 			return array(
+				'userPromotions' => $user->getAvailablePromotions(),
 				'type' => 'tinysong',
 				'artists' => null,
 				'songs' => $results_songs,
@@ -131,12 +133,13 @@ class Search extends Base
 	 * @param string $artist_id Search query
 	 * @return array
 	 */
-	public function doArtistSearch($artist_id)
+	public function doArtistSearch($artist_id, User $user)
 	{
 		try
 		{
 			$results_songs = $this->getArtistSongs($artist_id);
 			return array(
+				'userPromotions' => $user->getAvailablePromotions(),
 				'type' => 'artist',
 				'artist' => $artist_id,
 				'songs' => $results_songs,

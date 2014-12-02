@@ -7,7 +7,7 @@ html, body {
 }
 #content {
 	height: 100%;
-	padding-top: 61px;
+	padding-top: 52px;
 }
 input {
 	border-color: none;
@@ -55,6 +55,18 @@ input {
 	padding: 15px;
 	float: none;
 }
+#search .item-listitem.item-song {
+	margin-bottom: 23px;
+}
+#search .item-song .song-info {
+	float: left;
+}
+#search .item-song .song-status {
+	padding: 12px 12px 0 0;
+}
+#search .item-listitem.item-song > div {
+	position: relative;
+}
 .item-listitem .song-status {
 	padding: 0;
 }
@@ -69,6 +81,41 @@ input {
 	margin: 10px 0;
 	padding: 5px 0;
 	text-align: center;
+}
+.item-listitem.item-category .item-category-title {
+	color: #fff;
+	text-shadow: 0px 1px 5px #777;
+}
+
+/**
+ * Song Buttons
+ */
+.song-btn-container {
+	bottom: -20px;
+	position: absolute;
+	right: -10px;
+}
+.song-btn {
+	border-radius: 30px;
+	box-shadow: 0 1px 7px #888;
+	box-sizing: initial;
+	font-size: 30px;
+	height: 35px;
+	line-height: 30px;
+	margin: 0 2px;
+	padding: 6px;
+	width: 35px;
+}
+.song-btn.song-btn-promote {
+	text-align: center;
+}
+.song-btn.song-btn-add {
+	font-size: 45px;
+	line-height: 45px;
+}
+.song-btn.song-btn-add > i {
+	display: block;
+	margin-top: -8px;
 }
 
 /**
@@ -295,7 +342,7 @@ input {
 	overflow: hidden;
 }
 #search .item-listitem {
-	padding: 0 15px 15px;
+	padding: 0 15px 5px;
 }
 #search .item-listitem.item-category {
 	padding: 5px 15px;

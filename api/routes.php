@@ -120,7 +120,8 @@ $app->get('/api/v1/search/artist/:id', function ($id) use ($base) {
 	if(ApiHandler::validKey())
 	{
 		$search = new Search();
-		echo ApiHandler::sendResponse(200, true, $search->doArtistSearch($id));
+		$base->getUser()->getUserByApiKey($_GET['apikey']);
+		echo ApiHandler::sendResponse(200, true, $search->doArtistSearch($id, $base->getUser()));
 	}
 	else
 	{
@@ -135,7 +136,8 @@ $app->get('/api/v1/search/:query(/:count(/:page))', function ($query, $count = 3
 	if(ApiHandler::validKey())
 	{
 		$search = new Search();
-		echo ApiHandler::sendResponse(200, true, $search->doSearch($query, $count, $page));
+		$base->getUser()->getUserByApiKey($_GET['apikey']);
+		echo ApiHandler::sendResponse(200, true, $search->doSearch($query, $count, $page, $base->getUser()));
 	}
 	else
 	{
