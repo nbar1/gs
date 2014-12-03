@@ -71,6 +71,32 @@ class Search extends Base
 	}
 
 	/**
+	 * Get Most Popular Songs
+	 *
+	 * Returns an array of song search results based on popularity
+	 *
+	 * @param string $monthly Expand to monthly popular songs
+	 * @return array
+	 */
+	public function getMostPopularSongs(User $user, $monthly = false)
+	{
+		$this->authenticateToGrooveShark();
+		if($monthly) {
+			$results = $this->getGsAPI()->getPopularSongsMonth(30);
+		}
+		else
+		{
+			$results = $this->getGsAPI()->getPopularSongsToday(30);
+		}
+		return array(
+			'userPromotions' => $user->getAvailablePromotions(),
+			'type' => 'tinysong',
+			'artists' => null,
+			'songs' => $results,
+		);
+	}
+
+	/**
 	 * Parse artist search results
 	 *
 	 * Parses the artist search results and tried to return only relevant artist

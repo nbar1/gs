@@ -1,14 +1,21 @@
 <div class="row">
-	<div class='col-xs-10 song-info'>
+	<div class='col-xs-12 song-info'>
 		<div class='song-name'>{{song.SongName}}</div>
 		<div class='song-artist'>{{song.ArtistName}}</div>
 		<div class='song-id'>{{song.SongID}}</div>
 		<div class='song-artist_id'>{{song.ArtistID}}</div>
 		<div class='song-image'>{{song.CoverArtFilename}}</div>
 	</div>
-	<div class='col-xs-2 song-status' ng-class="{'show-loading': showLoading==true}" loader></div>
 </div>
 <div class="song-btn-container">
-	<button class='btn btn-warning song-btn song-btn-promote' ng-click="addSong(song, true)"><i class="fa fa-star"></i></button>
-	<button class='btn btn-success song-btn song-btn-add' ng-click="addSong(song, false)"><i class="fa">+</i></button>
+	<button class='btn btn-warning song-btn song-btn-promote' ng-click="addSong(song, true)">
+		<i class="fa fa-star"></i>
+	</button>
+	<button class='btn btn-success song-btn song-btn-add' ng-class="{'song-btn-loading': showLoading==true, 'song-btn-thumbsup': status=='success'}" ng-click="addSong(song, false)">
+		<div class="song-btn-status-container">
+			<i class="fa">+</i>
+			<i class="fa fa-spin fa-circle-o-notch"></i>
+			<i class="fa fa-thumbs-o-up"></i>
+		</div>
+	</button>
 </div>

@@ -114,6 +114,22 @@ $app->get('/api/v1/song/:token', function ($token) use ($base) {
 });
 
 /**
+ * Search for popular songs
+ */
+$app->get('/api/v1/search/popular(/:monthly)', function ($monthly) use ($base) {
+	if(ApiHandler::validKey())
+	{
+		$search = new Search();
+		$base->getUser()->getUserByApiKey($_GET['apikey']);
+		echo ApiHandler::sendResponse(200, true, $search->getMostPopularSongs($base->getUser()));
+	}
+	else
+	{
+		ApiHandler::notAuthenticated();
+	}
+});
+
+/**
  * Search for a given artist
  */
 $app->get('/api/v1/search/artist/:id', function ($id) use ($base) {

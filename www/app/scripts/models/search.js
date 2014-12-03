@@ -17,6 +17,15 @@ angular.module('gsApp')
 		 */
 		doSearch: function(query, type) {
 			var url = (type == 'artist') ? '/api/v1/search/artist/' : '/api/v1/search/';
+			if(type == 'artist') {
+				var url = '/api/v1/search/artist/';
+			}
+			else if(type == 'popular') {
+				var url = '/api/v1/search/popular/';
+			}
+			else {
+				var url = '/api/v1/search/';
+			}
 			url = url + query + "?apikey=" + $cookies.gs_apikey;
 			var promise = $http({
 				url: url,

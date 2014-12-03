@@ -99,23 +99,40 @@ input {
 	border-radius: 30px;
 	box-shadow: 0 1px 7px #888;
 	box-sizing: initial;
-	font-size: 30px;
-	height: 35px;
-	line-height: 30px;
+	font-size: 20px;
+	height: 25px;
+	line-height: 20px;
 	margin: 0 2px;
+	overflow: hidden;
 	padding: 6px;
-	width: 35px;
+	width: 25px;
 }
 .song-btn.song-btn-promote {
 	text-align: center;
 }
 .song-btn.song-btn-add {
-	font-size: 45px;
-	line-height: 45px;
+	font-size: 35px;
+	line-height: 35px;
 }
-.song-btn.song-btn-add > i {
+.song-btn.song-btn-add i {
 	display: block;
-	margin-top: -8px;
+	margin: -8px 0 25px;
+}
+.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container {
+	margin-top: -40px;
+}
+.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container > i {
+	font-size: 24px;
+}
+.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container > i.fa-spin {
+	width: 24px;
+	margin-left: 1px;
+}
+.song-btn.song-btn-add.song-btn-thumbsup > .song-btn-status-container  {
+	margin-top: -103px;
+}
+.song-btn.song-btn-add.song-btn-thumbsup > .song-btn-status-container > i.fa-thumbs-o-up {
+	font-size: 24px;
 }
 
 /**
@@ -366,8 +383,8 @@ input {
 	display: none;
 }
 #search .item-song .song-name {
-	font-size: 16px;
-	height: 22px;
+	font-size: 20px;
+	height: 26px;
 	overflow: hidden;
 	width: 100%;
 }
@@ -375,6 +392,7 @@ input {
 	color: #666;
 	font-size: 12px;
 	margin-left: 5px;
+	margin-top: 5px;
 }
 #search .item-song .song-artist_id,
 #search .item-song .song-image,

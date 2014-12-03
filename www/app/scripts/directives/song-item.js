@@ -32,16 +32,8 @@ angular.module('gsApp')
 				// Add song to queue
 				scope.addSongToQueue(song, type, function(success) {
 					// Set status
+					scope.showLoading = false;
 					scope.status = (success) ? 'success' : 'error';
-					// Set timeout to dismiss loading indicator
-					$timeout(function() {
-						// Hide loading indicator
-						scope.showLoading = false;
-						// Set timeout to return status to waiting
-						$timeout(function() {
-							scope.status = 'waiting';
-						}, 1000);
-					}, 4000);
 				});
 			}
 		}

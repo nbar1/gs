@@ -110,6 +110,16 @@ angular.module('gsApp')
 			// Set page background to album art
 			$('.player-info').css('background-image', "url('http://images.gs-cdn.net/static/albums/500_" + $scope.song.image + "')");
 		});
+
+		// check if song was actually played
+		// grooveshark sometimes has a bad stream
+		$timeout(function() {
+			if(!$scope.song.positionPercent || $scope.song.positionPercent == 0) {
+				console.log('song didn\'t play');
+				$scope.markSongComplete();
+				$scope.getNextSong();
+			}
+		}, 10000);
 	}
 
 	/**
