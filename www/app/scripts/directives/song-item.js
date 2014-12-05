@@ -15,7 +15,10 @@ angular.module('gsApp')
 			/**
 			 * Status
 			 */
-			scope.status = 'waiting';
+			scope.status = {
+				promote: 'waiting',
+				add: 'waiting'
+			}
 
 			/**
 			 * Add Song
@@ -23,17 +26,21 @@ angular.module('gsApp')
 			 * @param song
 			 * @param type
 			 */
-			scope.addSong = function(song, type) {
-				// Show loading indicator
-				scope.showLoading = true;
-				// Set status as loading
-				scope.status = 'loading';
-
+			scope.addSong = function(song, promote) {
+				if(promote) {
+					scope.status.promote = 'loading';
+				}
+				else {
+					scope.status.add = 'loading';
+				}
 				// Add song to queue
-				scope.addSongToQueue(song, type, function(success) {
-					// Set status
-					scope.showLoading = false;
-					scope.status = (success) ? 'success' : 'error';
+				scope.addSongToQueue(song, promote, function(success) {
+					if(promote) {
+						scope.status.promote = (success) ? 'success' : 'error';
+					}
+					else {
+						scope.status.add = (success) ? 'success' : 'error';
+					}
 				});
 			}
 		}

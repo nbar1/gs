@@ -110,6 +110,16 @@ input {
 .song-btn.song-btn-promote {
 	text-align: center;
 }
+.song-btn.song-btn-promote .song-btn-status-container {
+	margin-top: 11px;
+}
+.song-btn.song-btn-promote i.fa-star {
+	margin-left: 3px;
+}
+.song-btn.song-btn-promote i {
+	display: block;
+	margin: -8px 0 25px;
+}
 .song-btn.song-btn-add {
 	font-size: 35px;
 	line-height: 35px;
@@ -118,20 +128,23 @@ input {
 	display: block;
 	margin: -8px 0 25px;
 }
-.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container {
+.song-btn.song-btn-loading > .song-btn-status-container {
 	margin-top: -40px;
 }
-.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container > i {
+.song-btn.song-btn-loading > .song-btn-status-container > i {
 	font-size: 24px;
 }
-.song-btn.song-btn-add.song-btn-loading > .song-btn-status-container > i.fa-spin {
+.song-btn.song-btn-loading > .song-btn-status-container > i.fa-spin {
 	width: 24px;
 	margin-left: 1px;
 }
-.song-btn.song-btn-add.song-btn-thumbsup > .song-btn-status-container  {
+.song-btn.song-btn-thumbsup > .song-btn-status-container  {
 	margin-top: -103px;
 }
-.song-btn.song-btn-add.song-btn-thumbsup > .song-btn-status-container > i.fa-thumbs-o-up {
+.song-btn.song-btn-promote.song-btn-thumbsup > .song-btn-status-container  {
+	margin-top: -73px;
+}
+.song-btn.song-btn-thumbsup > .song-btn-status-container > i.fa-thumbs-o-up {
 	font-size: 24px;
 }
 
