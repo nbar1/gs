@@ -107,6 +107,10 @@ input {
 	padding: 6px;
 	width: 25px;
 }
+.song-btn-status-container {
+	-webkit-transition: margin-top 0.2s;
+	transition: margin-top: 0.2s;
+}
 .song-btn.song-btn-promote {
 	text-align: center;
 }
