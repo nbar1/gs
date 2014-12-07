@@ -27,7 +27,7 @@ angular.module('gsApp', [
 			$rootScope.searchBox.active = route.$$route.searchBox.active;
 			$rootScope.searchBox.showQueueButton = route.$$route.searchBox.showQueueButton;
 		}
-		
+
 		// Check for API Key in cookie
 		if($cookies.gs_apikey != undefined) {
 			$rootScope.apikey = $cookies.gs_apikey;
