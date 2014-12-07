@@ -3,4 +3,5 @@
 .git
 vendor
 api/config.php
-
+node_modules
+.sass-cache

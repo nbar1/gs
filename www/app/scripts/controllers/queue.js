@@ -34,7 +34,7 @@ angular.module('gsApp')
 		$location.path('/login');
 	}
 	else {
-		$scope.queuePromise = $interval(function() { $scope.getQueue() }, 10000);
+		//$scope.queuePromise = $interval(function() { $scope.getQueue() }, 10000);
 		$scope.getQueue();
 	}
 });
