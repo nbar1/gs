@@ -4,7 +4,7 @@
 			<a href="#/queue" class="hamburger-button">&#9835;</a>
 		</div>
 		<div class="search-container" ng-swipe-right="gotoQueue()" ng-swipe-left="gotoQueue()">
-			<form>
+			<form ng-submit="doSearch(query)">
 				<div class="input-group">
 					<input type="text" id="search-input" name="query" class="form-control input-lg" placeholder="Search" ng-model="query">
 					<span class="input-group-btn">
