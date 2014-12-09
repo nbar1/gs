@@ -20,7 +20,7 @@ A party mode playlist that interfaces with GrooveShark.
 * Pull in repo
 * Run `composer install`
 * Import database.sql to your mysql server
-* Copy `api/config.php.example` to `api/config.php` and fill in your credentials
+* Copy `api/config.php.example` to `api/config.php` and fill in your credentials, including your API Token.
 
 
 ## GrooveShark API
